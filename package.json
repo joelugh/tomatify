@@ -1,0 +1,38 @@
+{
+  "name": "tomatify",
+  "description": "a home for pomodoro playlists",
+  "version": "0.0.1",
+  "private": true,
+  "license": "Apache-2.0",
+  "author": "Hugh Chan",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joelugh/tomatify"
+  },
+  "engines": {
+    "node": ">=8"
+  },
+  "scripts": {
+    "deploy": "gcloud app deploy",
+    "dev": "next",
+    "build": "next build",
+    "gcp-build": "next build",
+    "start": "next start -p $PORT"
+  },
+  "dependencies": {
+    "@material-ui/core": "^3.9.3",
+    "@material-ui/icons": "^3.0.2",
+    "axios": "^0.18.0",
+    "firebase": "^5.11.0",
+    "firebaseui": "^3.6.0",
+    "he": "^1.2.0",
+    "jss": "^9.8.7",
+    "lodash": "^4.17.11",
+    "next": "^8.1.0",
+    "querystring": "^0.2.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-jss": "^8.6.1",
+    "readable-timestamp": "^0.2.0"
+  }
+}

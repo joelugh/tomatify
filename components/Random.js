@@ -62,56 +62,97 @@ const styles = theme => ({
     }
 });
 
-function RandomCard(props) {
+class RandomCard extends React.Component {
 
-    const {
-        classes,
-        description = '',
-        duration = 0,
-        imageSrc = '',
-        title = '',
-        userName = '',
-        onClick = () => {},
-        onRefresh = () => {},
-    } = props;
+    state = {
+        random: null,
+    }
 
-    return (
-        <div className={classes.root}>
-        <Card className={classes.card}>
-            <div className={classes.details}>
-                <CardContent className={classes.content}>
-                    <Typography variant="h6" onClick={onClick}>
-                        {title}
-                    </Typography>
-                    <div style={{display:'flex', alignItems:'center'}}>
-                        <Typography color="textSecondary" style={{fontSize: '0.8rem'}}>
-                                {userName}
+    componentDidMount() {
+        this.randomise();
+    }
+
+    componentDidUpdate(prevProps) {
+        if (this.props.poms !== prevProps.poms) this.randomise();
+    }
+
+    randomise = () => {
+        const {poms} = this.props;
+        let random = this.state.random;
+        if (poms.length === 0) {
+            random = null;
+        } else if (poms.length === 1) {
+            random = 0;
+        } else if (random === null) {
+            random = Math.floor(Math.random() * poms.length);
+        } else {
+            while (random === this.state.random) {
+                random = Math.floor(Math.random() * poms.length);
+            }
+        }
+        this.setState({ random });
+    }
+
+    render() {
+
+        const {
+            random,
+        } = this.state;
+
+        const {
+            classes,
+            onClick = () => {},
+            poms,
+        } = this.props;
+
+        if (random === null || random >= poms.length) return null;
+
+        const {
+            description = '',
+            duration = 0,
+            imageSrc = '',
+            title = '',
+            userName = '',
+        } = poms[random];
+
+        return (
+            <div className={classes.root}>
+            <Card className={classes.card}>
+                <div className={classes.details}>
+                    <CardContent className={classes.content}>
+                        <Typography variant="h6" onClick={onClick}>
+                            {title}
                         </Typography>
-                        <Typography  color="textSecondary" style={{fontSize: '0.8rem', paddingLeft: 5}}>
-                                {` — ${duration} mins`}
+                        <div style={{display:'flex', alignItems:'center'}}>
+                            <Typography color="textSecondary" style={{fontSize: '0.8rem'}}>
+                                    {userName}
+                            </Typography>
+                            <Typography  color="textSecondary" style={{fontSize: '0.8rem', paddingLeft: 5}}>
+                                    {` — ${duration} mins`}
+                            </Typography>
+                        </div>
+                        <Typography variant="caption" component="span" style={{fontSize: '0.7rem', paddingTop: 5, paddingBottom: 10, maxWidth: 200}}color="textSecondary">
+                            {description}
                         </Typography>
-                    </div>
-                    <Typography variant="caption" component="span" style={{fontSize: '0.7rem', paddingTop: 5, paddingBottom: 10, maxWidth: 200}}color="textSecondary">
-                        {description}
-                    </Typography>
-                    <IconButton aria-label="Refresh" className={classes.refreshButton} onClick={onRefresh}>
-                     <RefreshIcon className={classes.refreshIcon} />
+                        <IconButton aria-label="Refresh" className={classes.refreshButton} onClick={this.randomise}>
+                        <RefreshIcon className={classes.refreshIcon} />
+                        </IconButton>
+                    </CardContent>
+                </div>
+                <CardMedia
+                    className={classes.cover}
+                    image={imageSrc}
+                    onClick={onClick}
+                    title={title}
+                >
+                    <IconButton aria-label="Play/pause">
+                        <PlayArrowIcon className={classes.playIcon} />
                     </IconButton>
-                </CardContent>
+                </CardMedia>
+            </Card>
             </div>
-            <CardMedia
-                className={classes.cover}
-                image={imageSrc}
-                onClick={onClick}
-                title={title}
-            >
-                <IconButton aria-label="Play/pause">
-                     <PlayArrowIcon className={classes.playIcon} />
-                </IconButton>
-            </CardMedia>
-        </Card>
-        </div>
-    );
+        );
+    }
 }
 
 RandomCard.propTypes = {

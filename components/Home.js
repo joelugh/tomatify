@@ -128,7 +128,7 @@ class Home extends React.Component {
 
     handleClick = (id) => {
         const pom = this.state.poms[id];
-        const pomRef = firebase.database().ref(`pom/${id}/clicks`);
+        const pomRef = firebase.database().ref(`clicks/${id}`);
         pomRef.transaction(currentClicks => (currentClicks || 0) + 1);
         document.location.href = pom.uri;
     }

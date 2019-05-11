@@ -101,7 +101,7 @@ class RandomCard extends React.Component {
 
         const {
             classes,
-            onClick = () => {},
+            onClick: _onClick,
             poms,
         } = this.props;
 
@@ -113,7 +113,10 @@ class RandomCard extends React.Component {
             imageSrc = '',
             title = '',
             userName = '',
+            id,
         } = poms[random];
+
+        const onClick = () => _onClick(id);
 
         return (
             <div className={classes.root}>
@@ -142,10 +145,12 @@ class RandomCard extends React.Component {
                 <CardMedia
                     className={classes.cover}
                     image={imageSrc}
-                    onClick={onClick}
                     title={title}
                 >
-                    <IconButton aria-label="Play/pause">
+                    <IconButton
+                        aria-label="Play/pause"
+                        onClick={onClick}
+                    >
                         <PlayArrowIcon className={classes.playIcon} />
                     </IconButton>
                 </CardMedia>

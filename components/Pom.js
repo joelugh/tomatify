@@ -5,7 +5,6 @@ import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import ListItem from '@material-ui/core/ListItem';
 import IconButton  from '@material-ui/core/IconButton';
-import Avatar from '@material-ui/core/Avatar';
 import Divider  from '@material-ui/core/Divider';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -54,6 +53,16 @@ const styles = theme => ({
     details: {
         backgroundColor: 'rgba(0,0,0,.03)',
         borderRadius: '0px 0px 2px 2px',
+    },
+    cover: {
+        width: 60,
+        height: 60,
+    },
+    playButton: {
+        backgroundColor: 'rgba(0,0,0,.05)',
+        width: 60,
+        height: 60,
+        marginLeft: -60,
     }
 });
 
@@ -67,6 +76,7 @@ class ExpandingPom extends React.Component {
             duration = 0,
             lastModified = '',
             isFavourite,
+            imageSrc = '',
             divider = false,
             description = '',
             expanded = false,
@@ -112,9 +122,10 @@ class ExpandingPom extends React.Component {
                                 justifyContent: 'flex-start',
                             }}
                         >
-                            <Avatar onClick={onClick}>
+                            <img src={imageSrc} className={classes.cover} />
+                            <IconButton aria-label="play" className={classes.playButton} onClick={onClick} >
                                 <PlayArrowIcon />
-                            </Avatar>
+                            </IconButton>
                             <div style={{
                                 display: 'flex',
                                 flexDirection: 'column',

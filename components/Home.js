@@ -171,8 +171,11 @@ class Home extends React.Component {
         let poms = Object.keys(_poms)
             .sort((a,b) => _poms[b].createTime - _poms[a].createTime)
             .map(k => ({ ...selectPomData(_poms[k]), id: k}));
-        if (poms && filter === "uploads") poms = poms.filter(pom => pom.userId === user.id);
-        if (poms && filter === "saved") poms = poms.filter(pom => user.saved && user.saved[pom.id]);
+
+        if (user) {
+            if (poms && filter === "uploads") poms = poms.filter(pom => pom.userId === user.id);
+            if (poms && filter === "saved") poms = poms.filter(pom => user.saved && user.saved[pom.id]);
+        }
 
         const isPending = pending || (user && !poms);
         const isLoaded = user != null && !isPending;

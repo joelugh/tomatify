@@ -70,6 +70,14 @@ class Home extends React.Component {
                     this.setState({user});
                 });
                 userRef.transaction(userData => {
+                    if (userData) {
+                        if (!userData.syncs) userData.syncs = {};
+                        const today = new Date().toLocaleDateString();
+                        if (userData.syncs.today !== today) {
+                            userData.syncs.today = today;
+                            userData.syncs.count = 10;
+                        }
+                    }
                     return {
                         ...(userData || {}),
                         ...user,
@@ -138,8 +146,11 @@ class Home extends React.Component {
         pomRef.remove();
     }
 
-    handleRefresh = (_id) => {
+    handleSync = (_id) => {
+        const {user} = this.state;
         const id = _id.split(':').pop()
+        const syncCountRef = firebase.database().ref(`users/${user.id}/syncs/count`);
+        syncCountRef.transaction(count => count > 0 ? count - 1 : 0);
         axios({
             method: 'post',
             url: `${config.cloudFunctionsBaseUrl}/getSpotifyPlaylist`,
@@ -214,7 +225,7 @@ class Home extends React.Component {
                 {loadedPoms && poms && <Poms
                     poms={poms}
                     user={user}
-                    onRefresh={this.handleRefresh}
+                    onSync={this.handleSync}
                     onClick={this.handleClick}
                     onToggleSaved={this.handleToggleSaved}
                     onDelete={this.handleDelete}

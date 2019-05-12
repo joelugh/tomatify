@@ -7,13 +7,15 @@ import ListItem from '@material-ui/core/ListItem';
 import IconButton  from '@material-ui/core/IconButton';
 import Divider  from '@material-ui/core/Divider';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import DeleteIcon from '@material-ui/icons/Delete';
 import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 
 import ExpansionPanel from './ExpansionPanel';
 import ExpansionPanelSummary from './ExpansionPanelSummary';
 import ExpansionPanelDetails from './ExpansionPanelDetails';
+
+import DeleteButton from './DeleteButton';
+import SyncButton from './SyncButton';
 
 const styles = theme => ({
     root: {
@@ -83,23 +85,32 @@ class ExpandingPom extends React.Component {
             onClick: _onClick = () => {},
             onDelete: _onDelete = () => {},
             onToggleSaved: _onToggleSaved = () => {},
+            onSync: _onSync = () => {},
+            remainingSyncs = 0,
             showSaved = false,
+            showSync = false,
             showDelete = false,
         } = this.props;
 
+
         const onClick = e => {
-            e.stopPropagation();
+            if (e) e.stopPropagation();
             _onClick(e);
         }
 
         const onDelete = e => {
-            e.stopPropagation();
+            if (e) e.stopPropagation();
             _onDelete(e);
         }
 
         const onToggleSaved = e => {
-            e.stopPropagation();
+            if (e) e.stopPropagation();
             _onToggleSaved(e);
+        }
+
+        const onSync = e => {
+            if (e) e.stopPropagation();
+            _onSync(e);
         }
 
         return (
@@ -158,11 +169,8 @@ class ExpandingPom extends React.Component {
                         {showSaved ? <IconButton aria-label="Favourite" onClick={onToggleSaved}>
                             {isFavourite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
                         </IconButton> : null}
-                        {showDelete ?
-                            <IconButton aria-label="Delete" onClick={onDelete}>
-                            <DeleteIcon />
-                            </IconButton>
-                        : null}
+                        {showSync ? <SyncButton onSync={onSync} title={title} remainingSyncs={remainingSyncs} /> : null}
+                        {showDelete ? <DeleteButton onDelete={onDelete} title={title} /> : null}
                         </div>
                     </div>
                 </ExpansionPanelSummary>

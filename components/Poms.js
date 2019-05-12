@@ -20,6 +20,7 @@ class Poms extends React.Component {
 
         const listProps = {
             favourites: (user && user.saved) || {},
+            remainingSyncs: (user && user.syncs && user.syncs.count) || 0,
             poms,
             showDelete: !!(filter === "uploads" && user),
             showSaved: !!(filter !== "uploads" && user),
@@ -27,6 +28,7 @@ class Poms extends React.Component {
             onClick: this.props.onClick,
             onDelete: this.props.onDelete,
             onToggleSaved: this.props.onToggleSaved,
+            onSync: this.props.onSync,
         };
 
         return (

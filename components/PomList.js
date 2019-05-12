@@ -43,9 +43,11 @@ class PomList extends React.Component {
             showSaved,
             subheaderText,
             favourites,
+            remainingSyncs,
             onClick,
             onDelete,
             onToggleSaved,
+            onSync,
         } = this.props;
 
         return <List className={classes.root} subheader={<ListSubheader>{subheaderText} ({poms.length})</ListSubheader>} >
@@ -61,6 +63,9 @@ class PomList extends React.Component {
                     onClick={() => onClick(id)}
                     onDelete={() => onDelete(uri)}
                     onToggleSaved={() => onToggleSaved(id)}
+                    onSync={() => onSync(id)}
+                    remainingSyncs={remainingSyncs}
+                    showSync={showDelete}
                     showDelete={showDelete}
                     showSaved={showSaved}
                     divider={idx !== poms.length-1}

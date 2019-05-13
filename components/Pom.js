@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import ListItem from '@material-ui/core/ListItem';
+import Button from '@material-ui/core/Button';
 import IconButton  from '@material-ui/core/IconButton';
 import Divider  from '@material-ui/core/Divider';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
@@ -14,6 +15,7 @@ import ExpansionPanel from './ExpansionPanel';
 import ExpansionPanelSummary from './ExpansionPanelSummary';
 import ExpansionPanelDetails from './ExpansionPanelDetails';
 
+import TrackList from './TrackList';
 import DeleteButton from './DeleteButton';
 import SyncButton from './SyncButton';
 
@@ -55,6 +57,8 @@ const styles = theme => ({
     details: {
         backgroundColor: 'rgba(0,0,0,.03)',
         borderRadius: '0px 0px 2px 2px',
+        display: 'flex',
+        flexDirection: 'column',
     },
     cover: {
         width: 60,
@@ -65,7 +69,11 @@ const styles = theme => ({
         width: 60,
         height: 60,
         marginLeft: -60,
-    }
+    },
+    description: {
+        paddingTop: 15,
+        paddingBottom: 15,
+    },
 });
 
 class ExpandingPom extends React.Component {
@@ -87,6 +95,7 @@ class ExpandingPom extends React.Component {
             onToggleSaved: _onToggleSaved = () => {},
             onSync: _onSync = () => {},
             remainingSyncs = 0,
+            tracks = [],
             showSaved = false,
             showSync = false,
             showDelete = false,
@@ -175,9 +184,13 @@ class ExpandingPom extends React.Component {
                     </div>
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails className={classes.details}>
-                    <Typography variant="caption">
-                        {description}
-                    </Typography>
+                    {description && <div className={classes.description}>
+                        <Typography variant="caption">
+                            {description}
+                        </Typography>
+                    </div>}
+                    <TrackList tracks={tracks} />
+                    <Button style={{marginTop: 15}} onClick={onClick}>Play Now</Button>
                 </ExpansionPanelDetails>
                 </ExpansionPanel>
             {divider && <Divider />}

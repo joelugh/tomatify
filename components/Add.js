@@ -227,9 +227,12 @@ class AddButton extends React.Component {
 
         return (
             <div>
-                <Typography variant="subtitle1">Adding as: {this.props.userName}</Typography>
-                <br />
-                <Button variant="outlined" color="primary" onClick={this.handleClickOpen}>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={this.handleClickOpen}
+                    style={{margin: 15}}
+                >
                     Add Pomodoro Playlist
                 </Button>
                 <AddDialogWrapped

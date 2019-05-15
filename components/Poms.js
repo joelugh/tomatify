@@ -33,7 +33,7 @@ class Poms extends React.Component {
 
         return (
             <React.Fragment>
-                <Typography component="div" variant="h4" style={{marginTop: 40}}>Pomodoro Playlists</Typography>
+                <Typography component="div" variant="h4" style={{marginTop: 20}}>Pomodoro Playlists</Typography>
                 {poms && <Random {...randomProps} />}
                 {poms && <PomList {...listProps} />}
             </React.Fragment>

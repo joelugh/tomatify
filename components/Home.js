@@ -10,6 +10,7 @@ import Add from './Add';
 import Poms from './Poms';
 import Loading from './Loading';
 import BottomNav from './BottomNav';
+import Hero from './Hero';
 
 import { selectPomData } from '../utils';
 
@@ -42,7 +43,7 @@ class Home extends React.Component {
         });
 
         // FirebaseUI config.
-        var uiConfig = {
+        const uiConfig = {
             callbacks: {
                 signInSuccessWithAuthResult: () => this.setState({pending: true}),
                 uiShown: () => this.setState({pending: false}),
@@ -206,8 +207,8 @@ class Home extends React.Component {
             <div
                 id="container"
                 style={{
-                    paddingTop: '50px',
-                    paddingBottom: '50px',
+                    paddingTop: 40,
+                    paddingBottom: 50,
                     width:'100%',
                     minHeight:'90vh',
                     display:'flex',
@@ -216,6 +217,7 @@ class Home extends React.Component {
                     alignItems: 'center',
                 }}
             >
+                <Hero />
                 <div id="firebaseui-auth-container"></div>
                 {isPending && <Loading />}
                 {isLoaded && <Add

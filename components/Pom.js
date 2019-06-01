@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Timestamp from 'react-timestamp';
 
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
@@ -163,7 +164,7 @@ class ExpandingPom extends React.Component {
                                     </Typography>
                                 <br />
                                 <Typography component="span" variant="subtitle1" className={classes.inline} color="textSecondary" style={{fontSize: '0.7em',}}>
-                                {`${lastModified}`}
+                                    <Timestamp relative date={lastModified} />
                                 </Typography>
                                 <Typography component="span" variant="subtitle2" className={classes.inline} color="textSecondary" style={{paddingLeft: 10, fontSize: '0.6em',}}>
                                 {expanded ? 'less' : 'more'}

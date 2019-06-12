@@ -123,6 +123,9 @@ class ExpandingPom extends React.Component {
             _onSync(e);
         }
 
+        const date = new Date(0); // The 0 sets the date to the epoch
+        date.setUTCSeconds(lastModified/1000);
+
         return (
             <ListItem alignItems="flex-start" className={classes.listItem}>
                 <ExpansionPanel className={classes.panel} expanded={expanded}>
@@ -164,7 +167,7 @@ class ExpandingPom extends React.Component {
                                     </Typography>
                                 <br />
                                 <Typography component="span" variant="subtitle1" className={classes.inline} color="textSecondary" style={{fontSize: '0.7em',}}>
-                                    <Timestamp relative date={lastModified} />
+                                    <Timestamp relative date={date} />
                                 </Typography>
                                 <Typography component="span" variant="subtitle2" className={classes.inline} color="textSecondary" style={{paddingLeft: 10, fontSize: '0.6em',}}>
                                 {expanded ? 'less' : 'more'}

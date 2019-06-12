@@ -70,26 +70,29 @@ class Add extends React.Component {
         });
     };
 
-    processUri = (uri) => {
-        if (/^spotify:user:\w+:playlist:\w+$/.test(uri)) return uri;
-        if (!/^https:\/\/open\.spotify\.com\/user\/\w+\/playlist\/\w+/.test(uri)) return;
-        const regex = /^https:\/\/open\.spotify\.com\/user\/(\w+)\/playlist\/(\w+)/;
-        const found = uri.match(regex);
-        if (found.length !== 3) return;
-        if (!found[1] || !found[2]) return;
-        return `spotify:user:${found[1]}:playlist:${found[2]}`;
+    getIdFromUri = (uri) => {
+        const regexes = [
+            /^spotify:playlist:(\w+)/,
+            /^spotify:user:\w+:playlist:(\w+)/,
+            /^https:\/\/open\.spotify\.com\/playlist\/(\w+)/,
+            /^https:\/\/open\.spotify\.com\/user\/\w+\/playlist\/(\w+)/,
+        ];
+        for (let i = 0; i < regexes.length; i++) {
+            const found = uri.match(regexes[i]);
+            if (found && found.length == 2) return found[1];
+        }
+        return null;
     }
 
     handleSubmit = (e) => {
         e.preventDefault();
-        const {uri: _uri} = this.state;
-        const uri = this.processUri(_uri);
-        if (!/^spotify:user:\w+:playlist:\w+$/.test(uri)) {
+        const {uri} = this.state;
+        const id = this.getIdFromUri(uri);
+        if (!id) {
             this.setState({warning: 'Bad Link or Uri'});
             return;
         };
         this.setState({pending: true, warning:''});
-        const id = uri.split(':').pop();
         axios({
             method: 'post',
             url: `${config.cloudFunctionsBaseUrl}/getSpotifyPlaylist`,

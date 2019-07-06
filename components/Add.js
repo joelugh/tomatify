@@ -73,9 +73,9 @@ class Add extends React.Component {
     getIdFromUri = (uri) => {
         const regexes = [
             /^spotify:playlist:(\w+)/,
-            /^spotify:user:\w+:playlist:(\w+)/,
+            /^spotify:user:[\w\.]+:playlist:(\w+)/,
             /^https:\/\/open\.spotify\.com\/playlist\/(\w+)/,
-            /^https:\/\/open\.spotify\.com\/user\/\w+\/playlist\/(\w+)/,
+            /^https:\/\/open\.spotify\.com\/user\/[\w\.]+\/playlist\/(\w+)/,
         ];
         for (let i = 0; i < regexes.length; i++) {
             const found = uri.match(regexes[i]);

@@ -9,6 +9,9 @@ import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import RefreshIcon from '@material-ui/icons/Refresh';
+import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
+import FavoriteIcon from '@material-ui/icons/Favorite';
+
 
 const styles = theme => ({
     root: {
@@ -51,15 +54,16 @@ const styles = theme => ({
         height: 80,
         width: 80,
     },
-    refreshIcon: {
+    icon: {
         height: 15,
         width: 15,
     },
-    refreshButton: {
+    buttons: {
+        display: 'flex',
         position: 'absolute',
         left: 0,
         bottom: 0,
-    }
+    },
 });
 
 class RandomCard extends React.Component {
@@ -73,7 +77,9 @@ class RandomCard extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (this.props.poms !== prevProps.poms) this.randomise();
+        const {random} = this.state;
+        const {poms=[]} = this.props;
+        if (random === null || random >= poms.length) this.randomise();
     }
 
     randomise = () => {
@@ -102,7 +108,9 @@ class RandomCard extends React.Component {
         const {
             classes,
             onClick: _onClick,
+            onToggleSaved: _onToggleSaved,
             poms,
+            favourites,
         } = this.props;
 
         if (random === null || random >= poms.length) return null;
@@ -116,7 +124,10 @@ class RandomCard extends React.Component {
             id,
         } = poms[random];
 
+        const isFavourite = favourites[id];
+
         const onClick = () => _onClick(id);
+        const onToggleSaved = () => _onToggleSaved(id);
 
         return (
             <div className={classes.root}>
@@ -137,9 +148,14 @@ class RandomCard extends React.Component {
                         <Typography variant="caption" component="span" style={{fontSize: '0.7rem', paddingTop: 5, paddingBottom: 10, maxWidth: 200}}color="textSecondary">
                             {description}
                         </Typography>
-                        <IconButton aria-label="Refresh" className={classes.refreshButton} onClick={this.randomise}>
-                        <RefreshIcon className={classes.refreshIcon} />
-                        </IconButton>
+                        <div className={classes.buttons}>
+                            <IconButton aria-label="Refresh" className={classes.refreshButton} onClick={this.randomise}>
+                                <RefreshIcon className={classes.icon} />
+                            </IconButton>
+                            <IconButton aria-label="Favourite" className={classes.favouriteButton} onClick={onToggleSaved}>
+                                {isFavourite ? <FavoriteIcon className={classes.icon} /> : <FavoriteBorderIcon className={classes.icon}/>}
+                            </IconButton>
+                        </div>
                     </CardContent>
                 </div>
                 <CardMedia

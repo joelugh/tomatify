@@ -4,6 +4,7 @@ import * as firebase from "firebase/app";
 
 import "firebase/auth";
 import "firebase/database";
+import "firebase/messaging";
 
 import Header from './Header';
 import Add from './Add';
@@ -25,6 +26,7 @@ class Home extends React.Component {
     state = {
         user: null,
         poms: {},
+        popular: {},
         pending: true,
         loadingPoms: true,
         filter: 'recents',
@@ -35,6 +37,12 @@ class Home extends React.Component {
         try {
             firebase.initializeApp(config.firebaseConfig);
         } catch(err) {}
+
+        let popularRef = firebase.database().ref('popular');
+        popularRef.on('value', snapshot => {
+            const popular = snapshot.val();
+            this.setState({popular});
+        });
 
         let pomsRef = firebase.database().ref('pom');
         pomsRef.on('value', snapshot => {
@@ -56,7 +64,7 @@ class Home extends React.Component {
 
         firebase.auth().onAuthStateChanged(_user => {
             if (_user) {
-                const user = {
+                const providerUser = {
                     id: _user.uid,
                     name: _user.displayName,
                     email: _user.email,
@@ -65,25 +73,60 @@ class Home extends React.Component {
                     created: _user.metadata.creationTime,
                     last: _user.metadata.lastSignInTime,
                 }
-                const userRef = firebase.database().ref(`users/${user.id}`);
+
+                const userRef = firebase.database().ref(`users/${providerUser.id}`);
                 userRef.on('value', snapshot => {
                     const user = snapshot.val();
                     this.setState({user});
-                });
-                userRef.transaction(userData => {
-                    if (userData) {
-                        if (!userData.syncs) userData.syncs = {};
+
+                    if (user) {
+                        if (!user.syncs) user.syncs = {};
                         const today = new Date().toLocaleDateString();
-                        if (userData.syncs.today !== today) {
-                            userData.syncs.today = today;
-                            userData.syncs.count = 10;
+                        if (user.syncs.today !== today) {
+                            user.syncs.today = today;
+                            user.syncs.count = 10;
                         }
                     }
-                    return {
-                        ...(userData || {}),
-                        ...user,
-                    }
+                    userRef.update({
+                        ...(user || {}),
+                        ...providerUser,
+                    });
+
                 });
+
+                const param = encodeURIComponent(config.firebaseConfig.messagingSenderId);
+                navigator.serviceWorker.register(`static/firebase-messaging-sw.js?messagingSenderId=${param}`)
+                .then((registration) => {
+                    // Request permission and get token.....
+                    const messaging = firebase.messaging();
+                    if('undefined' !== typeof messaging.b ) delete(messaging.b); // hacky fix from SO
+                    messaging.useServiceWorker(registration);
+                    messaging.requestPermission()
+                    .then(() => {
+                        return messaging.getToken();
+                    })
+                    .then((token) => {
+                        // Write the new post's data simultaneously in the posts list and the user's post list.
+                        console.log('updating token');
+                        const updates = {};
+                        updates[`users/${providerUser.id}/messagingTokens/${token}`] = true;
+                        updates[`notify/${providerUser.id}/${token}`] = true;
+                        return firebase.database().ref().update(updates);
+                    })
+                    .then(() => {
+                        console.log('posted token');
+                    })
+                    .catch((err) => {
+                        console.log('error:', err);
+                    })
+
+                    messaging.onMessage(function(payload) {
+                        // This is where we handle notifications in the foreground
+                        console.log('notification:', payload);
+                    })
+
+                });
+
                 this.setState({pending:false})
             } else {
                 this.setState({user: null});
@@ -177,7 +220,7 @@ class Home extends React.Component {
 
     render() {
 
-        const {poms: _poms = {}, user, pending, loadingPoms, filter} = this.state;
+        const {poms: _poms = {}, popular: _popular = {}, user, pending, loadingPoms, filter} = this.state;
 
         // Sort and filter poms
         let poms = Object.keys(_poms)
@@ -188,6 +231,10 @@ class Home extends React.Component {
             if (poms && filter === "uploads") poms = poms.filter(pom => pom.userId === user.id);
             if (poms && filter === "saved") poms = poms.filter(pom => user.saved && user.saved[pom.id]);
         }
+
+        const popular = {};
+        popular["all"] = Object.keys(_poms).length > 0 && _popular["all"] ? _popular["all"].map(o => ({ ...selectPomData(_poms[o.id]), id: o.id})).slice(0,100) : [];
+        popular["month"] = Object.keys(_poms).length > 0 && _popular["month"] ? _popular["month"].map(o => ({ ...selectPomData(_poms[o.id]), id: o.id})).slice(0,100) : [];
 
         const isPending = pending || (user && !poms);
         const isLoaded = user != null && !isPending;
@@ -224,15 +271,18 @@ class Home extends React.Component {
                     userName={(user && user.name) || "No one"}
                     onAdd={this.handleAdd}
                 />}
-                {loadedPoms && poms && <Poms
-                    poms={poms}
-                    user={user}
-                    onSync={this.handleSync}
-                    onClick={this.handleClick}
-                    onToggleSaved={this.handleToggleSaved}
-                    onDelete={this.handleDelete}
-                    filter={filter}
-                />}
+                {loadedPoms && poms && <>
+                    <Poms
+                        poms={poms}
+                        popular={popular}
+                        user={user}
+                        onSync={this.handleSync}
+                        onClick={this.handleClick}
+                        onToggleSaved={this.handleToggleSaved}
+                        onDelete={this.handleDelete}
+                        filter={filter}
+                    />
+                </>}
             </div>
             {user && <BottomNav
                 value={filter}

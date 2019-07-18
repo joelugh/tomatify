@@ -77,130 +77,126 @@ const styles = theme => ({
     },
 });
 
-class ExpandingPom extends React.Component {
+function ExpandingPom({
+    classes,
+    title = '',
+    userName = '',
+    duration = 0,
+    lastModified = '',
+    isFavourite,
+    imageSrc = '',
+    divider = false,
+    description = '',
+    expanded = false,
+    onClick: _onClick = () => {},
+    onDelete: _onDelete = () => {},
+    onToggleSaved: _onToggleSaved = () => {},
+    onSync: _onSync = () => {},
+    remainingSyncs = 0,
+    tracks = [],
+    showSaved = false,
+    showSync = false,
+    showDelete = false,
+    handleExpand = () => {},
+}) {
 
-    render() {
-        const {
-            classes,
-            title = '',
-            userName = '',
-            duration = 0,
-            lastModified = '',
-            isFavourite,
-            imageSrc = '',
-            divider = false,
-            description = '',
-            expanded = false,
-            onClick: _onClick = () => {},
-            onDelete: _onDelete = () => {},
-            onToggleSaved: _onToggleSaved = () => {},
-            onSync: _onSync = () => {},
-            remainingSyncs = 0,
-            tracks = [],
-            showSaved = false,
-            showSync = false,
-            showDelete = false,
-        } = this.props;
+    const onClick = e => {
+        if (e) e.stopPropagation();
+        _onClick(e);
+    }
 
+    const onDelete = e => {
+        if (e) e.stopPropagation();
+        _onDelete(e);
+    }
 
-        const onClick = e => {
-            if (e) e.stopPropagation();
-            _onClick(e);
-        }
+    const onToggleSaved = e => {
+        if (e) e.stopPropagation();
+        _onToggleSaved(e);
+    }
 
-        const onDelete = e => {
-            if (e) e.stopPropagation();
-            _onDelete(e);
-        }
+    const onSync = e => {
+        if (e) e.stopPropagation();
+        _onSync(e);
+    }
 
-        const onToggleSaved = e => {
-            if (e) e.stopPropagation();
-            _onToggleSaved(e);
-        }
+    const date = new Date(0); // The 0 sets the date to the epoch
+    date.setUTCSeconds(lastModified/1000);
 
-        const onSync = e => {
-            if (e) e.stopPropagation();
-            _onSync(e);
-        }
-
-        const date = new Date(0); // The 0 sets the date to the epoch
-        date.setUTCSeconds(lastModified/1000);
-
-        return (
-            <ListItem alignItems="flex-start" className={classes.listItem}>
-                <ExpansionPanel className={classes.panel} expanded={expanded}>
-                <ExpansionPanelSummary classes={{root: classes.summary, content: classes.content}}>
+    return (
+        <ListItem alignItems="flex-start" className={classes.listItem}>
+            <ExpansionPanel className={classes.panel} expanded={expanded}>
+            <ExpansionPanelSummary classes={{root: classes.summary, content: classes.content}}>
+                <div
+                    onClick={handleExpand}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                    }}
+                >
                     <div
-                        onClick={this.props.handleExpand}
                         style={{
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'space-between',
-                            width: '100%',
+                            justifyContent: 'flex-start',
                         }}
                     >
-                        <div
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'flex-start',
-                            }}
-                        >
-                            <img src={imageSrc} className={classes.cover} />
-                            <IconButton aria-label="play" className={classes.playButton} onClick={onClick} >
-                                <PlayArrowIcon />
-                            </IconButton>
-                            <div style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                paddingLeft: 15,
-                                paddingRight: 15,
-
-                            }}>
-                                <Typography onClick={onClick} variant="h6" style={{fontSize: '0.9em',}}>{title}</Typography>
-                                <div>
-                                    <Typography component="span" variant="subtitle1" className={classes.inline} color="textPrimary" style={{fontSize: '0.75em',}}>
-                                    {userName}
-                                    </Typography>
-                                    <Typography component="span" variant="subtitle1" className={classes.inline} color="textPrimary" style={{fontSize: '0.75em',}}>
-                                    {` — ${duration} mins`}
-                                    </Typography>
-                                <br />
-                                <Typography component="span" variant="subtitle1" className={classes.inline} color="textSecondary" style={{fontSize: '0.7em',}}>
-                                    <Timestamp relative date={date} />
-                                </Typography>
-                                <Typography component="span" variant="subtitle2" className={classes.inline} color="textSecondary" style={{paddingLeft: 10, fontSize: '0.6em',}}>
-                                {expanded ? 'less' : 'more'}
-                                </Typography>
-                                </div>
-                            </div>
-                        </div>
+                        <img src={imageSrc} className={classes.cover} />
+                        <IconButton aria-label="play" className={classes.playButton} onClick={onClick} >
+                            <PlayArrowIcon />
+                        </IconButton>
                         <div style={{
                             display: 'flex',
-                            alignItems: 'center',
+                            flexDirection: 'column',
+                            paddingLeft: 15,
+                            paddingRight: 15,
+
                         }}>
-                        {showSaved ? <IconButton aria-label="Favourite" onClick={onToggleSaved}>
-                            {isFavourite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-                        </IconButton> : null}
-                        {showSync ? <SyncButton onSync={onSync} title={title} remainingSyncs={remainingSyncs} /> : null}
-                        {showDelete ? <DeleteButton onDelete={onDelete} title={title} /> : null}
+                            <Typography onClick={onClick} variant="h6" style={{fontSize: '0.9em',}}>{title}</Typography>
+                            <div>
+                                <Typography component="span" variant="subtitle1" className={classes.inline} color="textPrimary" style={{fontSize: '0.75em',}}>
+                                {userName}
+                                </Typography>
+                                <Typography component="span" variant="subtitle1" className={classes.inline} color="textPrimary" style={{fontSize: '0.75em',}}>
+                                {` — ${duration} mins`}
+                                </Typography>
+                            <br />
+                            <Typography component="span" variant="subtitle1" className={classes.inline} color="textSecondary" style={{fontSize: '0.7em',}}>
+                                <Timestamp relative date={date} />
+                            </Typography>
+                            <Typography component="span" variant="subtitle2" className={classes.inline} color="textSecondary" style={{paddingLeft: 10, fontSize: '0.6em',}}>
+                            {expanded ? 'less' : 'more'}
+                            </Typography>
+                            </div>
                         </div>
                     </div>
-                </ExpansionPanelSummary>
-                <ExpansionPanelDetails className={classes.details}>
-                    {description && <div className={classes.description}>
-                        <Typography variant="caption">
-                            {description}
-                        </Typography>
-                    </div>}
-                    <TrackList tracks={tracks} />
-                    <Button style={{marginTop: 15}} onClick={onClick}>Play Now</Button>
-                </ExpansionPanelDetails>
-                </ExpansionPanel>
-            {divider && <Divider />}
-            </ListItem>
-        );
-    }
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                    }}>
+                    {showSaved ? <IconButton aria-label="Favourite" onClick={onToggleSaved}>
+                        {isFavourite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                    </IconButton> : null}
+                    {showSync ? <SyncButton onSync={onSync} title={title} remainingSyncs={remainingSyncs} /> : null}
+                    {showDelete ? <DeleteButton onDelete={onDelete} title={title} /> : null}
+                    </div>
+                </div>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails className={classes.details}>
+                {description && <div className={classes.description}>
+                    <Typography variant="caption">
+                        {description}
+                    </Typography>
+                </div>}
+                <TrackList tracks={tracks} />
+                <Button style={{marginTop: 15}} onClick={onClick}>Play Now</Button>
+            </ExpansionPanelDetails>
+            </ExpansionPanel>
+        {divider && <Divider />}
+        </ListItem>
+    );
 }
 
 ExpandingPom.propTypes = {

@@ -67,16 +67,19 @@ class PomList extends React.Component {
             onClick,
             onDelete,
             onToggleSaved,
+            onToggleType: _onToggleType,
             onSync,
         } = this.props;
 
         const unfoldLess = all || expanded !== null;
 
+        const onToggleType = _onToggleType ? _onToggleType : () => {};
+
         return <List
             className={classes.root}
             subheader={
                 <ListSubheader className={classes.subheader}>
-                    <span>{subheaderText} ({poms.length})</span>
+                    <div onClick={onToggleType}>{subheaderText} ({poms.length})</div>
                     <Button className={classes.toggle} onClick={this.handleToggle}>
                         {unfoldLess ? <UnfoldLessIcon /> : <UnfoldMoreIcon />}
                     </Button>

@@ -9,8 +9,7 @@ const styles = theme => ({
     },
 });
 
-function CircularIndeterminate(props) {
-    const { classes } = props;
+function CircularIndeterminate({ classes }) {
     return (
         <div>
             <CircularProgress className={classes.progress} />

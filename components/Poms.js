@@ -5,40 +5,52 @@ import Typography from '@material-ui/core/Typography';
 import Random from './Random';
 import PomList from './PomList';
 
-class Poms extends React.Component {
+function Poms(props) {
 
-    render() {
+    const { poms, popular = [], user = {}, filter } = props;
 
-        const { poms, user = {}, filter } = this.props;
+    const [isHot, setIsHot] = React.useState(true);
 
-        const randomProps = {
-            poms,
-            onClick: this.props.onClick,
-        };
+    const randomProps = {
+        poms,
+        onClick: props.onClick,
+        favourites: (user && user.saved) || {},
+        onToggleSaved: props.onToggleSaved,
+    };
 
-        const subheaderText = `${(filter === "recents") ? "Latest" : (filter === "saved") ? "Saved" : "Your"} Pomodoro Playlists`;
+    const subheaderText = `${(filter === "recents") ? "Latest" : (filter === "saved") ? "Saved" : "Your"} Pomodoro Playlists`;
 
-        const listProps = {
-            favourites: (user && user.saved) || {},
-            remainingSyncs: (user && user.syncs && user.syncs.count) || 0,
-            poms,
-            showDelete: !!(filter === "uploads" && user),
-            showSaved: !!(filter !== "uploads" && user),
-            subheaderText,
-            onClick: this.props.onClick,
-            onDelete: this.props.onDelete,
-            onToggleSaved: this.props.onToggleSaved,
-            onSync: this.props.onSync,
-        };
+    const listProps = {
+        favourites: (user && user.saved) || {},
+        remainingSyncs: (user && user.syncs && user.syncs.count) || 0,
+        poms,
+        showDelete: !!(filter === "uploads" && user),
+        showSaved: !!(filter !== "uploads" && user),
+        subheaderText,
+        onClick: props.onClick,
+        onDelete: props.onDelete,
+        onToggleSaved: props.onToggleSaved,
+        onSync: props.onSync,
+    };
 
-        return (
-            <React.Fragment>
-                <Typography component="div" variant="h4" style={{marginTop: 20}}>Pomodoro Playlists</Typography>
-                {poms && <Random {...randomProps} />}
-                {poms && <PomList {...listProps} />}
-            </React.Fragment>
-        );
+    const popularListProps = {
+        subheaderText: isHot ? "Hot Poms" : "Top Poms",
+        poms: isHot ? popular["month"] : popular["all"],
+        onToggleType: () => setIsHot(!!!isHot),
+        onClick: props.onClick,
+        showSaved: !!(filter !== "uploads" && user),
+        favourites: (user && user.saved) || {},
+        onToggleSaved: props.onToggleSaved,
     }
+
+    return (
+        <>
+            <Typography component="div" variant="h4" style={{marginTop: 20, marginBottom: 20}}>Pomodoro Playlists</Typography>
+            {filter === "recents" && poms && <PomList {...popularListProps} />}
+            {poms && <Random {...randomProps} />}
+            {poms && <PomList {...listProps} />}
+        </>
+    );
 }
 
 export default Poms;

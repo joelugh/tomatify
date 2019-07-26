@@ -1,4 +1,7 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import { compose } from 'redux';
+import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase';
 import PropTypes from 'prop-types';
 import Timestamp from 'react-timestamp';
 
@@ -19,6 +22,7 @@ import ExpansionPanelDetails from './ExpansionPanelDetails';
 import TrackList from './TrackList';
 import DeleteButton from './DeleteButton';
 import SyncButton from './SyncButton';
+import { selectPomData } from '../utils';
 
 const styles = theme => ({
     root: {
@@ -79,26 +83,30 @@ const styles = theme => ({
 
 function ExpandingPom({
     classes,
-    title = '',
-    userName = '',
-    duration = 0,
-    lastModified = '',
+    pom = {},
     isFavourite,
-    imageSrc = '',
     divider = false,
-    description = '',
     expanded = false,
     onClick: _onClick = () => {},
     onDelete: _onDelete = () => {},
     onToggleSaved: _onToggleSaved = () => {},
     onSync: _onSync = () => {},
     remainingSyncs = 0,
-    tracks = [],
     showSaved = false,
     showSync = false,
     showDelete = false,
     handleExpand = () => {},
 }) {
+
+    const {
+        title = '',
+        userName = '',
+        description = '',
+        duration = 0,
+        imageSrc = '',
+        lastModified = '',
+        tracks = [],
+    } = pom ? selectPomData(pom) : {};
 
     const onClick = e => {
         if (e) e.stopPropagation();
@@ -203,4 +211,13 @@ ExpandingPom.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(ExpandingPom);
+const ConnectedExpandingPom =  compose(
+    firebaseConnect(props => ([
+        `pom/${props.id}`,
+    ])),
+    connect((state, _props) => ({
+        pom: _props.id && state.firebase.data.pom && state.firebase.data.pom[_props.id],
+    })),
+)(ExpandingPom);
+
+export default withStyles(styles)(ConnectedExpandingPom);

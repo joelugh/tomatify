@@ -159,7 +159,7 @@ class Add extends React.Component {
                 <React.Fragment>
                 <img src={imageSrc} className={classes.cover}></img>
                 <Typography variant="h6">{playlist.name}</Typography>
-                <Typography variant="subtitle1" color={durationOkay ? "default" : "error"}>{duration} mins</Typography>
+                <Typography variant="subtitle1" color={durationOkay ? "inherit" : "error"}>{duration} mins</Typography>
                 {playlist.description && <Typography variant="caption" component="span" className={classes.description}>{he.decode(playlist.description)}</Typography>}
                 <Button onClick={durationOkay ? this.handleAdd : this.reset}>{durationOkay ? "Add" : "Back"}</Button>
                 </React.Fragment>

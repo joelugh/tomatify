@@ -1,19 +1,19 @@
 import React, { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import Document, { Head, Main, NextScript } from 'next/document'
-import flush from 'styled-jsx/server';
+import { ServerStyleSheets } from '@material-ui/styles';
+import theme from '../utils/theme';
 
 import config from '../config';
 
-class _Document extends Document {
+class MyDocument extends Document {
     render () {
-        const { pageContext } = this.props
         return (
             <html lang='pt-BR' dir='ltr'>
                 <Head>
                     <meta charSet='utf-8' />
                     <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no' />
-                    <meta name='theme-color' content={pageContext ? pageContext.theme.palette.primary.main : null} />
+                    <meta name='theme-color' content={theme.palette.primary.main} />
                     <link rel="apple-touch-icon" sizes="180x180" href="/static/favicon/apple-touch-icon.png" />
                     <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon/favicon-32x32.png" />
                     <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon/favicon-16x16.png" />
@@ -37,42 +37,27 @@ class _Document extends Document {
     }
 }
 
-_Document.getInitialProps = ctx => {
-    let pageContext
+MyDocument.getInitialProps = async ctx => {
 
-    const page = ctx.renderPage(Component => {
-        const WrappedComponent = props => {
-            pageContext = props.pageContext
-            return <Component {...props} />
-        }
+    // Render app and page and get the context of the page with collected side effects.
+    const sheets = new ServerStyleSheets();
+    const originalRenderPage = ctx.renderPage;
 
-        WrappedComponent.propTypes = {
-            pageContext: PropTypes.object.isRequired
-        }
+    ctx.renderPage = () => originalRenderPage({
+        enhanceApp: App => props => sheets.collect(<App {...props} />),
+    });
 
-        return WrappedComponent
-    })
-
-    let css
-
-    if (pageContext) {
-        css = pageContext.sheetsRegistry.toString()
-    }
+    const initialProps = await Document.getInitialProps(ctx);
 
     return {
-        ...page,
-        pageContext,
+      ...initialProps,
+      styles: (
+        <React.Fragment>
+          {initialProps.style}
+          {sheets.getStyleElement()}
+        </React.Fragment>
+      ),
+    };
+  };
 
-        styles: (
-            <Fragment>
-                <style
-                    id='jss-server-side'
-                    dangerouslySetInnerHTML={{ __html: css }}
-                />
-                {flush() || null}
-            </Fragment>
-        )
-    }
-}
-
-export default _Document
+  export default MyDocument;

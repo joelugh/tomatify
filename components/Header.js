@@ -1,4 +1,7 @@
 import React from 'react';
+import { connect } from 'react-redux'
+import { compose } from 'redux'
+import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase'
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -35,7 +38,7 @@ function Header(props) {
                 <Typography variant="h6" color="inherit" className={classes.grow}>
                     Tomatify
                 </Typography>
-                {user && <Button
+                {user && !user.isEmpty && <Button
                     id="sign-out"
                     color="inherit"
                     onClick={onSignOut}
@@ -50,5 +53,13 @@ function Header(props) {
 Header.propTypes = {
     classes: PropTypes.object.isRequired,
 };
+
+const connectedHeader = compose(
+    firebaseConnect(props => ([
+    ])),
+    connect((state) => ({
+        user: state.firebase.profile,
+    }))
+)(Header);
 
 export default withStyles(styles)(Header);

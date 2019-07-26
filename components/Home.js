@@ -1,10 +1,9 @@
 import React from 'react';
+import { connect } from 'react-redux'
+import { compose } from 'redux'
+import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase'
 import axios from 'axios';
 import * as firebase from "firebase/app";
-
-import "firebase/auth";
-import "firebase/database";
-import "firebase/messaging";
 
 import Header from './Header';
 import Add from './Add';
@@ -13,9 +12,8 @@ import Loading from './Loading';
 import BottomNav from './BottomNav';
 import Hero from './Hero';
 
-import { selectPomData } from '../utils';
-
 import config from '../config';
+import { getAuth, getDB } from '../db';
 
 var firebaseui = null;
 
@@ -24,31 +22,26 @@ if (global.window) firebaseui = require('firebaseui');
 class Home extends React.Component {
 
     state = {
-        user: null,
-        poms: {},
-        popular: {},
         pending: true,
         loadingPoms: true,
         filter: 'recents',
     };
 
+    componentDidUpdate(){
+        if (this.state.pending) {
+            if (isLoaded(this.props.recent) && isLoaded(this.props.popular)) {
+                this.setState({pending:false});
+            }
+        }
+    }
+
     componentDidMount() {
         // Initialize Firebase
-        try {
-            firebase.initializeApp(config.firebaseConfig);
-        } catch(err) {}
-
-        let popularRef = firebase.database().ref('popular');
-        popularRef.on('value', snapshot => {
-            const popular = snapshot.val();
-            this.setState({popular});
-        });
-
-        let pomsRef = firebase.database().ref('pom');
-        pomsRef.on('value', snapshot => {
-            const poms = snapshot.val();
-            this.setState({poms, loadingPoms:false});
-        });
+        if (this.state.pending) {
+            if (isLoaded(this.props.recent) && isLoaded(this.props.popular)) {
+                this.setState({pending:false});
+            }
+        }
 
         // FirebaseUI config.
         const uiConfig = {
@@ -62,7 +55,7 @@ class Home extends React.Component {
             ],
         };
 
-        firebase.auth().onAuthStateChanged(_user => {
+        getAuth().onAuthStateChanged(_user => {
             if (_user) {
                 const providerUser = {
                     id: _user.uid,
@@ -74,11 +67,9 @@ class Home extends React.Component {
                     last: _user.metadata.lastSignInTime,
                 }
 
-                const userRef = firebase.database().ref(`users/${providerUser.id}`);
-                userRef.on('value', snapshot => {
+                const userRef = getDB().ref(`users/${providerUser.id}`);
+                userRef.once('value', snapshot => {
                     const user = snapshot.val();
-                    this.setState({user});
-
                     if (user) {
                         if (!user.syncs) user.syncs = {};
                         const today = new Date().toLocaleDateString();
@@ -97,9 +88,8 @@ class Home extends React.Component {
                 const param = encodeURIComponent(config.firebaseConfig.messagingSenderId);
                 navigator.serviceWorker.register(`static/firebase-messaging-sw.js?messagingSenderId=${param}`)
                 .then((registration) => {
-                    // Request permission and get token.....
+                    // Request permission and get token....
                     const messaging = firebase.messaging();
-                    if('undefined' !== typeof messaging.b ) delete(messaging.b); // hacky fix from SO
                     messaging.useServiceWorker(registration);
                     messaging.requestPermission()
                     .then(() => {
@@ -125,13 +115,12 @@ class Home extends React.Component {
                         console.log('notification:', payload);
                     })
 
-                });
+                })
+                .catch(err => console.log(err));
 
-                this.setState({pending:false})
             } else {
-                this.setState({user: null});
                 if (!firebaseui) return;
-                let ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(firebase.auth());
+                let ui = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(getAuth());
                 ui.start('#firebaseui-auth-container', uiConfig);
             }
         });
@@ -143,7 +132,7 @@ class Home extends React.Component {
             uri,
             name: title,
         } = playlist;
-        const {user} = this.state;
+        const {user} = this.props;
         const userName = user.name;
         const userId = user.id;
         const duration = playlist.tracks.items.map(t => t.track.duration_ms).reduce((a,b) => a + b, 0)/1000;
@@ -157,41 +146,31 @@ class Home extends React.Component {
             createTime: firebase.database.ServerValue.TIMESTAMP,
             spotify: playlist,
         });
+        firebase.database().ref(`users/${userId}/poms/${uri}`).set(1);
     }
 
     handleToggleSaved = (id) => {
-        const {user} = this.state;
+        const {user} = this.props;
         const savedPomRef = firebase.database().ref(`users/${user.id}/saved/${id}`);
-        savedPomRef.transaction(isSaved => isSaved ? null : 1,
-            (err, success, snapshot) => {
-                if (success) this.setState(state => ({
-                    ...state,
-                    user : {
-                        ...user,
-                        saved : {
-                            ...user.saved,
-                            [id]: snapshot.val(),
-                        }
-                    }
-                }))
-            }
-        );
+        savedPomRef.transaction(isSaved => isSaved ? null : 1);
     }
 
     handleClick = (id) => {
-        const pom = this.state.poms[id];
         const pomRef = firebase.database().ref(`clicks/${id}`);
         pomRef.transaction(currentClicks => (currentClicks || 0) + 1);
-        document.location.href = pom.uri;
+        document.location.href = id;
     }
 
     handleDelete = (uri) => {
-        const pomRef = firebase.database().ref(`pom/${uri}`);
-        pomRef.remove();
+        const {user={}} = this.props;
+        const {id} = user;
+        if (!id) return;
+        firebase.database().ref(`pom/${uri}`).remove();
+        firebase.database().ref(`users/${user.id}/poms/${uri}`).remove();
     }
 
     handleSync = (_id) => {
-        const {user} = this.state;
+        const {user} = this.props;
         const id = _id.split(':').pop()
         const syncCountRef = firebase.database().ref(`users/${user.id}/syncs/count`);
         syncCountRef.transaction(count => count > 0 ? count - 1 : 0);
@@ -220,36 +199,15 @@ class Home extends React.Component {
 
     render() {
 
-        const {poms: _poms = {}, popular: _popular = {}, user, pending, loadingPoms, filter} = this.state;
+        const {pending: isPending, loadingPoms, filter} = this.state;
+        const {recent = {}, popular = {}, user} = this.props;
 
-        // Sort and filter poms
-        let poms = Object.keys(_poms)
-            .sort((a,b) => _poms[b].createTime - _poms[a].createTime)
-            .map(k => ({ ...selectPomData(_poms[k]), id: k}));
+        const isUser = user != null && !user.isEmpty && !isPending;
 
-        if (user) {
-            if (poms && filter === "uploads") poms = poms.filter(pom => pom.userId === user.id);
-            if (poms && filter === "saved") poms = poms.filter(pom => user.saved && user.saved[pom.id]);
-        }
-
-        const popular = {};
-        popular["all"] = Object.keys(_poms).length > 0 && _popular["all"] ? _popular["all"].map(o => ({ ...selectPomData(_poms[o.id]), id: o.id})).slice(0,100) : [];
-        popular["month"] = Object.keys(_poms).length > 0 && _popular["month"] ? _popular["month"].map(o => ({ ...selectPomData(_poms[o.id]), id: o.id})).slice(0,100) : [];
-
-        const isPending = pending || (user && !poms);
-        const isLoaded = user != null && !isPending;
-        const loadedPoms = !!!loadingPoms;
-
-        return <React.Fragment>
+        return <>
             <Header
                 user={user}
-                onSignOut={() => {
-                    this.setState({
-                        user: null,
-                        pending: true,
-                    })
-                    firebase.auth().signOut();
-                }}
+                onSignOut={() => getAuth().signOut()}
             />
             <div
                 id="container"
@@ -267,13 +225,13 @@ class Home extends React.Component {
                 <Hero />
                 <div id="firebaseui-auth-container"></div>
                 {isPending && <Loading />}
-                {isLoaded && <Add
+                {isUser && <Add
                     userName={(user && user.name) || "No one"}
                     onAdd={this.handleAdd}
                 />}
-                {loadedPoms && poms && <>
+                {!isPending && <>
                     <Poms
-                        poms={poms}
+                        recent={recent}
                         popular={popular}
                         user={user}
                         onSync={this.handleSync}
@@ -284,13 +242,29 @@ class Home extends React.Component {
                     />
                 </>}
             </div>
-            {user && <BottomNav
+            {isUser && <BottomNav
                 value={filter}
-                onChange={filter => this.setState({filter})}
+                onChange={filter => {
+                    window.scrollTo(0,0);
+                    setTimeout(() => {
+                        this.setState({filter})
+                    },0)
+                }}
             />}
-        </React.Fragment>;
+        </>;
 
     }
 }
 
-export default Home;
+export default compose(
+    firebaseConnect(props => ([
+        'popular',
+        'recent',
+    ])),
+    connect((state, _props) => ({
+        popular: state.firebase.data.popular,
+        recent: state.firebase.data.recent,
+        auth: state.firebase.auth,
+        user: state.firebase.profile,
+    }))
+)(Home);

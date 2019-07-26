@@ -36,7 +36,7 @@ class PomList extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (this.props.poms !== prevProps.poms) this.setState({expanded:null});
+        if (this.props.pomIds !== prevProps.pomIds) this.setState({expanded:null});
     }
 
     handleExpand = idx => this.setState(state => ({
@@ -58,7 +58,8 @@ class PomList extends React.Component {
 
         const {
             classes,
-            poms,
+            pomIds,
+            total,
             showDelete,
             showSaved,
             subheaderText,
@@ -79,31 +80,31 @@ class PomList extends React.Component {
             className={classes.root}
             subheader={
                 <ListSubheader className={classes.subheader}>
-                    <div onClick={onToggleType}>{subheaderText} ({poms.length})</div>
+                    {_onToggleType && <div style={{display: 'flex', alignItems:'center'}}><Button style={{padding: 1, marginRight: 5, minWidth:'0px'}} onClick={onToggleType}>{subheaderText}</Button> Poms ({total})</div>}
+                    {!_onToggleType && <div>{subheaderText} Poms ({total})</div>}
                     <Button className={classes.toggle} onClick={this.handleToggle}>
                         {unfoldLess ? <UnfoldLessIcon /> : <UnfoldMoreIcon />}
                     </Button>
                 </ListSubheader>
             }
         >
-            {poms.map((_pom, idx) => {
-                const { id, uri, ...pom } = _pom;
+            {pomIds.map((id, idx) => {
                 const isFavourite = favourites[id];
                 return <Pom
                     key={id}
-                    {...pom}
+                    id={id}
                     expanded={all || expanded === idx}
                     handleExpand={() => this.handleExpand(idx)}
                     isFavourite={isFavourite}
                     onClick={() => onClick(id)}
-                    onDelete={() => onDelete(uri)}
+                    onDelete={() => onDelete(id)}
                     onToggleSaved={() => onToggleSaved(id)}
                     onSync={() => onSync(id)}
                     remainingSyncs={remainingSyncs}
                     showSync={showDelete}
                     showDelete={showDelete}
                     showSaved={showSaved}
-                    divider={idx !== poms.length-1}
+                    divider={idx !== pomIds.length-1}
                 />
             })}
         </List>

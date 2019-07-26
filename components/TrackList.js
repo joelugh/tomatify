@@ -7,7 +7,6 @@
     import TableCell from '@material-ui/core/TableCell';
     import TableHead from '@material-ui/core/TableHead';
     import TableRow from '@material-ui/core/TableRow';
-    import Paper from '@material-ui/core/Paper';
 
     const styles = theme => ({
         root: {
@@ -27,27 +26,22 @@
 
     function TrackTable(props) {
         const { classes, tracks } = props;
-
         const widths = ['5%', '70%', '25%'];
         return (
             <Table className={classes.table}>
                 <TableHead>
                 <TableRow>
-                    <TableCell style={{width: widths[0]}} padding="none">#</TableCell>
-                    <TableCell style={{width: widths[1]}} align="left" padding="dense">Title</TableCell>
-                    <TableCell style={{width: widths[2]}} align="right" padding="dense">Duration</TableCell>
+                    <TableCell style={{width: widths[0]}} padding="none"><Typography variant="caption" >#</Typography></TableCell>
+                    <TableCell style={{width: widths[1]}} align="left" padding="none" ><Typography variant="caption" >Title</Typography></TableCell>
+                    <TableCell style={{width: widths[2]}} align="right" padding="none"><Typography variant="caption" >Duration</Typography></TableCell>
                 </TableRow>
                 </TableHead>
                 <TableBody>
                 {tracks.map((track,idx) => (
-                    <TableRow key={track.id} className={classes.row}>
-                    <TableCell style={{width: widths[0]}} component="th" scope="row" padding="none">{idx + 1}</TableCell>
-                    <TableCell
-                        align="left"
-                        padding="dense"
-                        style={{width: widths[1]}}
-                    ><Typography component="div" noWrap>{track.title}</Typography></TableCell>
-                    <TableCell style={{width: widths[2]}} align="right" padding="dense">{track.duration}</TableCell>
+                    <TableRow key={idx} className={classes.row}>
+                    <TableCell style={{width: widths[0]}} component="th" scope="row" padding="none"><Typography variant="caption" >{idx + 1}</Typography></TableCell>
+                    <TableCell style={{width: widths[1]}} align="left" padding="none"><Typography variant="caption" component="div" noWrap>{track.title}</Typography></TableCell>
+                    <TableCell style={{width: widths[2]}} align="right" padding="none" ><Typography variant="caption" >{track.duration}</Typography></TableCell>
                     </TableRow>
                 ))}
                 </TableBody>
@@ -56,7 +50,7 @@
     }
 
     TrackTable.propTypes = {
-    classes: PropTypes.object.isRequired,
+        classes: PropTypes.object.isRequired,
     };
 
     export default withStyles(styles)(TrackTable);

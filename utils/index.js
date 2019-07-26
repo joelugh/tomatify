@@ -2,19 +2,22 @@ import he from 'he';
 
 export const selectPomData = pom => {
     const {
-        spotify: {
-            images = [],
-            description: _description = '',
-            tracks: _tracks = [],
-        },
+        spotify = {},
         userName = '',
-        userId,
+        userId = '',
         title = '',
         duration: _duration = 0,
         createTime = 0,
-        uri,
+        uri ='',
     } = pom;
-    const tracks = _tracks.items.map(({track : {name, duration_ms, uri}}) => ({
+
+    const {
+        images = [],
+        description: _description = '',
+        tracks: _tracks = [],
+    } = spotify;
+    const {items = []} = _tracks;
+    const tracks = items.map(({track : {name, duration_ms, uri}}) => ({
         title: name,
         duration: `${Math.floor(duration_ms/1000/60)}:${(Math.round(duration_ms/1000%60)+'').padStart(2, '0')}`,
         uri,

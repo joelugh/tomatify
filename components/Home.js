@@ -200,9 +200,17 @@ class Home extends React.Component {
     render() {
 
         const {pending: isPending, loadingPoms, filter} = this.state;
-        const {recent = {}, popular = {}, user} = this.props;
+        let {recent = {}, popular = {}, user, tags, tag} = this.props;
 
         const isUser = user != null && !user.isEmpty && !isPending;
+
+        if (recent && recent["all"] && tags && tags[tag]) {
+            // need to give recent a new ref
+            recent = {
+                ...recent,
+                all: recent["all"].filter(id => tags[tag][id])
+            }
+        }
 
         return <>
             <Header
@@ -260,11 +268,14 @@ export default compose(
     firebaseConnect(props => ([
         'popular',
         'recent',
+        'tags',
     ])),
     connect((state, _props) => ({
         popular: state.firebase.data.popular,
         recent: state.firebase.data.recent,
         auth: state.firebase.auth,
         user: state.firebase.profile,
+        tags: state.firebase.data.tags,
+        tag: state.client.tag,
     }))
 )(Home);

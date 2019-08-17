@@ -134,9 +134,117 @@ const calcPopular = (context) => {
     });
 }
 
+const calcTags = () => {
+
+    /* EXPERIMENTAL */
+    const NEW_POM = "hatching_chick";
+    const HOT_POM = "fire";
+    const TOP_POM = "100";
+    const ALBUM_POM = "cd";
+    const ARTIST_POM = "microphone";
+
+    const dbRef = admin.database().ref();
+    return dbRef.once("value")
+    .then(snapshot => {
+        const db = snapshot.val();
+        const tagsById = db.tagsById ? db.tagsById : {};
+        const tags = db.tags ? db.tags : {};
+        tags[NEW_POM] = {};
+        tags[HOT_POM] = {};
+        tags[TOP_POM] = {};
+        tags[ALBUM_POM] = {};
+        tags[ARTIST_POM] = {};
+
+        const promises = [];
+
+        if (db.pom) Object.keys(db.pom).forEach(pomId => {
+            const pom = db.pom[pomId];
+            const {
+                spotify = {},
+                userId = '',
+            } = pom;
+            const {
+                tracks: _tracks = [],
+            } = spotify;
+            const {items = []} = _tracks;
+            const tracks = items.map(({track : {name, duration_ms, uri, artists, album}}) => ({
+                title: name,
+                artists: artists.map((artist) => artist.name),
+                album: album.name,
+                duration_ms,
+                uri,
+            }));
+
+            let isArtistPom = tracks.length > 0;
+            let isAlbumPom = tracks.length > 0;
+            const artists = tracks.length > 0 ? tracks[0].artists : [];
+            const album = tracks.length > 0 ? tracks[0].album : '';
+            tracks.forEach(track => {
+                let foundArtist = false;
+                let foundAlbum = false;
+                artists.forEach(artist => {
+                    if (track.artists.indexOf(artist) !== -1 || track.duration_ms <= 1000*60) foundArtist = true;
+                    if (track.album == album || track.duration_ms <= 1000*60) foundAlbum = true;
+                    if (!foundArtist) {
+                        if (track.title.indexOf(artist) !== -1 && (/remix/i).test(track.title)) foundArtist = true;
+                    }
+                })
+                if (!foundArtist) isArtistPom = false;
+                if (!foundAlbum) isAlbumPom = false;
+            })
+
+            let isNewPom = (db.popular && db.popular["week"]) ? db.popular["week"].slice(0,20).reduce((bool, p) => bool || p.id == pomId, false) : false;
+            let isHotPom = (db.popular && db.popular["month"]) ? db.popular["month"].slice(0,20).reduce((bool, p) => bool || p.id == pomId, false) : false;
+            let isTopPom = (db.popular && db.popular["all"]) ? db.popular["all"].slice(0,20).reduce((bool, p) => bool || p.id == pomId, false) : false;
+
+            tagsById[pomId] = tagsById[pomId] ? tagsById[pomId] : {};
+
+            if (isAlbumPom) {
+                tags[ALBUM_POM][pomId] = true;
+                tagsById[pomId][ALBUM_POM] = true;
+                tagsById[pomId][ARTIST_POM] = null;
+            } else if (isArtistPom) {
+                tags[ARTIST_POM][pomId] = true;
+                tagsById[pomId][ARTIST_POM] = true;
+                tagsById[pomId][ALBUM_POM] = null;
+            }
+
+            if (isTopPom) {
+                tags[TOP_POM][pomId] = true;
+                tagsById[pomId][TOP_POM] = true;
+                tagsById[pomId][HOT_POM] = null;
+                tagsById[pomId][NEW_POM] = null;
+            } else if (isHotPom) {
+                tags[HOT_POM][pomId] = true;
+                tagsById[pomId][HOT_POM] = true;
+                tagsById[pomId][TOP_POM] = null;
+                tagsById[pomId][NEW_POM] = null;
+            } else if (isNewPom) {
+                tags[NEW_POM][pomId] = true;
+                tagsById[pomId][NEW_POM] = true;
+                tagsById[pomId][HOT_POM] = null;
+                tagsById[pomId][TOP_POM] = null;
+            }
+            promises.push(admin.database().ref(`tagsById/${pomId}`).set(tagsById[pomId]));
+        })
+
+        return Promise.all([
+            admin.database().ref(`tags/${TOP_POM}`).set(tags[TOP_POM]),
+            admin.database().ref(`tags/${HOT_POM}`).set(tags[HOT_POM]),
+            admin.database().ref(`tags/${NEW_POM}`).set(tags[NEW_POM]),
+            admin.database().ref(`tags/${ALBUM_POM}`).set(tags[ALBUM_POM]),
+            admin.database().ref(`tags/${ARTIST_POM}`).set(tags[ARTIST_POM]),
+            ...promises,
+        ]);
+    })
+
+}
+
+
+exports.calcTags = functions.https.onRequest(calcTags);
 exports.calcRecent = functions.https.onRequest(calcRecent);
 exports.calcPopular = functions.https.onRequest(calcPopular);
-exports.scheduledCalcMostPopular = functions.pubsub.schedule('every 1 hours').onRun(calcPopular);
+exports.scheduledCalcMostPopular = functions.pubsub.schedule('every 1 hours').onRun((context) => calcPopular(context).then(calcTags));
 
 // [START makeUppercase]
 // Listens for new messages added to /messages/:pushId/original and creates an

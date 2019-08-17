@@ -24,6 +24,8 @@ import DeleteButton from './DeleteButton';
 import SyncButton from './SyncButton';
 import { selectPomData } from '../utils';
 
+import Tags from './Tags';
+
 const styles = theme => ({
     root: {
         width: '100%',
@@ -66,14 +68,14 @@ const styles = theme => ({
         flexDirection: 'column',
     },
     cover: {
-        width: 60,
-        height: 60,
+        width: 80,
+        height: 80,
     },
     playButton: {
         backgroundColor: 'rgba(0,0,0,.05)',
-        width: 60,
-        height: 60,
-        marginLeft: -60,
+        width: 80,
+        height: 80,
+        marginLeft: -80,
     },
     description: {
         paddingTop: 15,
@@ -83,6 +85,7 @@ const styles = theme => ({
 
 function ExpandingPom({
     classes,
+    id,
     pom = {},
     isFavourite,
     divider = false,
@@ -132,6 +135,7 @@ function ExpandingPom({
     date.setUTCSeconds(lastModified/1000);
 
     return (
+        <>
         <ListItem alignItems="flex-start" className={classes.listItem}>
             <ExpansionPanel className={classes.panel} expanded={expanded}>
             <ExpansionPanelSummary classes={{root: classes.summary, content: classes.content}}>
@@ -178,6 +182,9 @@ function ExpandingPom({
                             {expanded ? 'less' : 'more'}
                             </Typography>
                             </div>
+                            <div>
+                               <Tags id={id} />
+                            </div>
                         </div>
                     </div>
                     <div style={{
@@ -204,6 +211,7 @@ function ExpandingPom({
             </ExpansionPanel>
         {divider && <Divider />}
         </ListItem>
+        </>
     );
 }
 

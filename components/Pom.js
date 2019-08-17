@@ -90,6 +90,7 @@ function ExpandingPom({
     isFavourite,
     divider = false,
     expanded = false,
+    filter,
     onClick: _onClick = () => {},
     onDelete: _onDelete = () => {},
     onToggleSaved: _onToggleSaved = () => {},
@@ -133,6 +134,8 @@ function ExpandingPom({
 
     const date = new Date(0); // The 0 sets the date to the epoch
     date.setUTCSeconds(lastModified/1000);
+
+    const canModifyTags = filter === "uploads";
 
     return (
         <>
@@ -183,7 +186,7 @@ function ExpandingPom({
                             </Typography>
                             </div>
                             <div>
-                               <Tags id={id} />
+                               <Tags id={id} addButton={canModifyTags} deleteButton={canModifyTags} />
                             </div>
                         </div>
                     </div>
@@ -225,6 +228,7 @@ const ConnectedExpandingPom =  compose(
     ])),
     connect((state, _props) => ({
         pom: _props.id && state.firebase.data.pom && state.firebase.data.pom[_props.id],
+        filter: state.client.filter,
     })),
 )(ExpandingPom);
 

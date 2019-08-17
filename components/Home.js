@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux'
-import { compose } from 'redux'
+import { compose, bindActionCreators } from 'redux'
 import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase'
 import axios from 'axios';
 import * as firebase from "firebase/app";
@@ -14,6 +14,7 @@ import Hero from './Hero';
 
 import config from '../config';
 import { getAuth, getDB } from '../db';
+import { setFilter } from '../redux/client';
 
 var firebaseui = null;
 
@@ -24,7 +25,6 @@ class Home extends React.Component {
     state = {
         pending: true,
         loadingPoms: true,
-        filter: 'recents',
     };
 
     componentDidUpdate(){
@@ -199,8 +199,8 @@ class Home extends React.Component {
 
     render() {
 
-        const {pending: isPending, loadingPoms, filter} = this.state;
-        let {recent = {}, popular = {}, user, tags, tag} = this.props;
+        const {pending: isPending, loadingPoms} = this.state;
+        let {recent = {}, popular = {}, user, tags, tag, filter, setFilter} = this.props;
 
         const isUser = user != null && !user.isEmpty && !isPending;
 
@@ -255,7 +255,7 @@ class Home extends React.Component {
                 onChange={filter => {
                     window.scrollTo(0,0);
                     setTimeout(() => {
-                        this.setState({filter})
+                        setFilter(filter);
                     },0)
                 }}
             />}
@@ -277,5 +277,8 @@ export default compose(
         user: state.firebase.profile,
         tags: state.firebase.data.tags,
         tag: state.client.tag,
-    }))
+        filter: state.client.filter,
+    }),
+    dispatch => bindActionCreators({setFilter}, dispatch)
+    )
 )(Home);

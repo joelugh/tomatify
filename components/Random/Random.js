@@ -17,6 +17,7 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 import { selectPomData } from '../../utils';
 
 import Tags from '../Tags';
+import PomDrawer from '../PomDrawer';
 
 const styles = theme => ({
     root: {
@@ -98,9 +99,14 @@ function RandomCard(props) {
         isFavourite,
         onClick,
         onToggleSaved,
-        onRandomise,
+        onRandomise: _onRandomise,
         pom,
     } = props;
+
+    const onRandomise = (e) => {
+        e.stopPropagation();
+        _onRandomise(e);
+    }
 
     const {
         description = '',
@@ -113,7 +119,7 @@ function RandomCard(props) {
     return (
         <div className={classes.root}>
         <Card className={classes.card}>
-            <div className={classes.details}>
+            <PomDrawer id={id} className={classes.details}>
                 <CardContent className={classes.content}>
                     <Typography variant="h6" onClick={onClick}>
                         {title}
@@ -141,7 +147,7 @@ function RandomCard(props) {
                         </div>
                     </div>
                 </CardContent>
-            </div>
+            </PomDrawer>
             <CardMedia
                 className={classes.cover}
                 image={imageSrc}

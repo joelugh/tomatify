@@ -76,6 +76,7 @@ function Tags(props) {
                 setOpen(false)
             }} aria-labelledby="simple-dialog-title" open={open}>
                 {/* <DialogTitle id="simple-dialog-title">Set backup account</DialogTitle> */}
+                <div onClick={e => e.stopPropagation()}>
                 <Picker
                     onSelect={tag => {
                         setOpen(false)
@@ -92,6 +93,7 @@ function Tags(props) {
                     notFoundEmoji={"tomato"}
                     showSkinTones={false}
                 />
+                </div>
             </Dialog>}
             <>
                 {specialTags.map(tag => tags[tag] && <Chip

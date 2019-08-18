@@ -25,6 +25,7 @@ import SyncButton from './SyncButton';
 import { selectPomData } from '../utils';
 
 import Tags from './Tags';
+import PomDrawer from './PomDrawer';
 
 const styles = theme => ({
     root: {
@@ -142,8 +143,8 @@ function ExpandingPom({
         <ListItem alignItems="flex-start" className={classes.listItem}>
             <ExpansionPanel className={classes.panel} expanded={expanded}>
             <ExpansionPanelSummary classes={{root: classes.summary, content: classes.content}}>
-                <div
-                    onClick={handleExpand}
+                <PomDrawer
+                    id={id}
                     style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -169,7 +170,7 @@ function ExpandingPom({
                             paddingRight: 15,
 
                         }}>
-                            <Typography onClick={onClick} variant="h6" style={{fontSize: '0.9em',}}>{title}</Typography>
+                            <Typography variant="h6" style={{fontSize: '0.9em',}}>{title}</Typography>
                             <div>
                                 <Typography component="span" variant="subtitle1" className={classes.inline} color="textPrimary" style={{fontSize: '0.75em',}}>
                                 {userName}
@@ -180,9 +181,6 @@ function ExpandingPom({
                             <br />
                             <Typography component="span" variant="subtitle1" className={classes.inline} color="textSecondary" style={{fontSize: '0.7em',}}>
                                 <Timestamp relative date={date} />
-                            </Typography>
-                            <Typography component="span" variant="subtitle2" className={classes.inline} color="textSecondary" style={{paddingLeft: 10, fontSize: '0.6em',}}>
-                            {expanded ? 'less' : 'more'}
                             </Typography>
                             </div>
                             <div>
@@ -200,7 +198,7 @@ function ExpandingPom({
                     {showSync ? <SyncButton onSync={onSync} title={title} remainingSyncs={remainingSyncs} /> : null}
                     {showDelete ? <DeleteButton onDelete={onDelete} title={title} /> : null}
                     </div>
-                </div>
+                </PomDrawer>
             </ExpansionPanelSummary>
             <ExpansionPanelDetails className={classes.details}>
                 {description && <div className={classes.description}>

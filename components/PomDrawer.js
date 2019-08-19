@@ -47,6 +47,7 @@ const useStyles = makeStyles({
         paddingBottom: 15,
     },
     cover: {
+        objectFit: 'cover',
         width: 100,
         height: 100,
     },

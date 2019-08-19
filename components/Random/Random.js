@@ -35,10 +35,12 @@ const styles = theme => ({
         maxWidth: '500px',
         justifyContent: 'space-between',
         position: 'relative',
-        height: '200px',
+        minHeight: '200px',
     },
     details: {
         display: 'flex',
+        width: '70%',
+        overflow: 'hidden',
         flexDirection: 'column',
     },
     content: {
@@ -46,8 +48,7 @@ const styles = theme => ({
         minHeight: '150px',
     },
     cover: {
-        width: 150,
-        minWidth: 150,
+        width: '30%',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -72,12 +73,10 @@ const styles = theme => ({
         left: 0,
         bottom: 0,
         alignItems: 'center',
+        width: '60%',
     },
     tags: {
-        // display: 'flex',
-        // position: 'absolute',
-        // left: 10,
-        // bottom: 40,
+        display: 'flex',
         paddingLeft: 5,
     }
 });

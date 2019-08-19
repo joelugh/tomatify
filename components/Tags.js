@@ -63,7 +63,7 @@ function Tags(props) {
 
     const recent = !allTags ? [] : Object.keys(allTags)
         .filter(tag => !!!special[tag])
-        .sort((a,b) => Object.keys(allTags[b]).length - Object.keys(allTags[a]));
+        .sort((a,b) => Object.keys(allTags[b]).length - Object.keys(allTags[a]).length);
 
     const canAdd = addButton && (!tags || Object.keys(tags).filter(tag=>!special[tag]).length < 3);
 

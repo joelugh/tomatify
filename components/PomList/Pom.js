@@ -69,6 +69,7 @@ const styles = theme => ({
         flexDirection: 'column',
     },
     cover: {
+        objectFit: 'cover',
         width: 80,
         height: 80,
     },
@@ -168,7 +169,7 @@ function ExpandingPom({
                             flexDirection: 'column',
                             paddingLeft: 15,
                             paddingRight: 15,
-
+                            width: 'auto',
                         }}>
                             <Typography variant="h6" style={{fontSize: '0.9em',}}>{title}</Typography>
                             <div>

@@ -207,6 +207,9 @@ const calcTags = () => {
                 tags[ARTIST_POM][pomId] = true;
                 tagsById[pomId][ARTIST_POM] = true;
                 tagsById[pomId][ALBUM_POM] = null;
+            } else {
+                tagsById[pomId][ARTIST_POM] = null;
+                tagsById[pomId][ALBUM_POM] = null;
             }
 
             if (isTopPom) {
@@ -224,6 +227,10 @@ const calcTags = () => {
                 tagsById[pomId][NEW_POM] = true;
                 tagsById[pomId][HOT_POM] = null;
                 tagsById[pomId][TOP_POM] = null;
+            } else {
+                tagsById[pomId][HOT_POM] = null;
+                tagsById[pomId][TOP_POM] = null;
+                tagsById[pomId][NEW_POM] = null;
             }
             promises.push(admin.database().ref(`tagsById/${pomId}`).set(tagsById[pomId]));
         })

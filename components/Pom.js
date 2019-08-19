@@ -24,6 +24,9 @@ import DeleteButton from './DeleteButton';
 import SyncButton from './SyncButton';
 import { selectPomData } from '../utils';
 
+import Tags from './Tags';
+import PomDrawer from './PomDrawer';
+
 const styles = theme => ({
     root: {
         width: '100%',
@@ -66,14 +69,14 @@ const styles = theme => ({
         flexDirection: 'column',
     },
     cover: {
-        width: 60,
-        height: 60,
+        width: 80,
+        height: 80,
     },
     playButton: {
         backgroundColor: 'rgba(0,0,0,.05)',
-        width: 60,
-        height: 60,
-        marginLeft: -60,
+        width: 80,
+        height: 80,
+        marginLeft: -80,
     },
     description: {
         paddingTop: 15,
@@ -83,10 +86,12 @@ const styles = theme => ({
 
 function ExpandingPom({
     classes,
+    id,
     pom = {},
     isFavourite,
     divider = false,
     expanded = false,
+    filter,
     onClick: _onClick = () => {},
     onDelete: _onDelete = () => {},
     onToggleSaved: _onToggleSaved = () => {},
@@ -131,12 +136,15 @@ function ExpandingPom({
     const date = new Date(0); // The 0 sets the date to the epoch
     date.setUTCSeconds(lastModified/1000);
 
+    const canModifyTags = filter === "uploads";
+
     return (
+        <>
         <ListItem alignItems="flex-start" className={classes.listItem}>
             <ExpansionPanel className={classes.panel} expanded={expanded}>
             <ExpansionPanelSummary classes={{root: classes.summary, content: classes.content}}>
-                <div
-                    onClick={handleExpand}
+                <PomDrawer
+                    id={id}
                     style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -162,7 +170,7 @@ function ExpandingPom({
                             paddingRight: 15,
 
                         }}>
-                            <Typography onClick={onClick} variant="h6" style={{fontSize: '0.9em',}}>{title}</Typography>
+                            <Typography variant="h6" style={{fontSize: '0.9em',}}>{title}</Typography>
                             <div>
                                 <Typography component="span" variant="subtitle1" className={classes.inline} color="textPrimary" style={{fontSize: '0.75em',}}>
                                 {userName}
@@ -174,9 +182,9 @@ function ExpandingPom({
                             <Typography component="span" variant="subtitle1" className={classes.inline} color="textSecondary" style={{fontSize: '0.7em',}}>
                                 <Timestamp relative date={date} />
                             </Typography>
-                            <Typography component="span" variant="subtitle2" className={classes.inline} color="textSecondary" style={{paddingLeft: 10, fontSize: '0.6em',}}>
-                            {expanded ? 'less' : 'more'}
-                            </Typography>
+                            </div>
+                            <div>
+                               <Tags id={id} addButton={canModifyTags} deleteButton={canModifyTags} />
                             </div>
                         </div>
                     </div>
@@ -190,7 +198,7 @@ function ExpandingPom({
                     {showSync ? <SyncButton onSync={onSync} title={title} remainingSyncs={remainingSyncs} /> : null}
                     {showDelete ? <DeleteButton onDelete={onDelete} title={title} /> : null}
                     </div>
-                </div>
+                </PomDrawer>
             </ExpansionPanelSummary>
             <ExpansionPanelDetails className={classes.details}>
                 {description && <div className={classes.description}>
@@ -204,6 +212,7 @@ function ExpandingPom({
             </ExpansionPanel>
         {divider && <Divider />}
         </ListItem>
+        </>
     );
 }
 
@@ -217,6 +226,7 @@ const ConnectedExpandingPom =  compose(
     ])),
     connect((state, _props) => ({
         pom: _props.id && state.firebase.data.pom && state.firebase.data.pom[_props.id],
+        filter: state.client.filter,
     })),
 )(ExpandingPom);
 

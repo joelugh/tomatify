@@ -16,13 +16,15 @@ import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import { selectPomData } from '../../utils';
 
+import Tags from '../Tags';
+import PomDrawer from '../PomDrawer';
 
 const styles = theme => ({
     root: {
         display: 'flex',
         justifyContent: 'center',
         width:'100%',
-        padding:20,
+        padding: 20,
     },
     card: {
         display: 'flex',
@@ -67,7 +69,15 @@ const styles = theme => ({
         position: 'absolute',
         left: 0,
         bottom: 0,
+        alignItems: 'center',
     },
+    tags: {
+        // display: 'flex',
+        // position: 'absolute',
+        // left: 10,
+        // bottom: 40,
+        paddingLeft: 5,
+    }
 });
 
 function RandomCard(props) {
@@ -85,12 +95,18 @@ function RandomCard(props) {
 
     const {
         classes,
+        id,
         isFavourite,
         onClick,
         onToggleSaved,
-        onRandomise,
+        onRandomise: _onRandomise,
         pom,
     } = props;
+
+    const onRandomise = (e) => {
+        e.stopPropagation();
+        _onRandomise(e);
+    }
 
     const {
         description = '',
@@ -103,7 +119,7 @@ function RandomCard(props) {
     return (
         <div className={classes.root}>
         <Card className={classes.card}>
-            <div className={classes.details}>
+            <PomDrawer id={id} className={classes.details}>
                 <CardContent className={classes.content}>
                     <Typography variant="h6" onClick={onClick}>
                         {title}
@@ -126,9 +142,12 @@ function RandomCard(props) {
                         <IconButton aria-label="Favourite" className={classes.favouriteButton} onClick={onToggleSaved}>
                             {isFavourite ? <FavoriteIcon className={classes.icon} /> : <FavoriteBorderIcon className={classes.icon}/>}
                         </IconButton>
+                        <div className={classes.tags}>
+                            <Tags id={id}/>
+                        </div>
                     </div>
                 </CardContent>
-            </div>
+            </PomDrawer>
             <CardMedia
                 className={classes.cover}
                 image={imageSrc}

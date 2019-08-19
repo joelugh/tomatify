@@ -26,7 +26,7 @@
 
     function TrackTable(props) {
         const { classes, tracks } = props;
-        const widths = ['5%', '70%', '25%'];
+        const widths = ['8%', '67%', '25%'];
         return (
             <Table className={classes.table}>
                 <TableHead>

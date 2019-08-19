@@ -1,4 +1,5 @@
 import React from 'react';
+import {connect} from 'react-redux';
 
 import Typography from '@material-ui/core/Typography';
 
@@ -6,11 +7,15 @@ import Random from './Random';
 import PomList from './PomList';
 
 import InfiniteScroll from 'react-infinite-scroller';
+import { Emoji } from 'emoji-mart';
+import { Chip } from '@material-ui/core';
+import { bindActionCreators } from 'redux';
+import { setTag } from '../redux/client';
 
 
 function Poms(props) {
 
-    const { recent = {}, popular = {}, user = {}, filter } = props;
+    const { recent = {}, popular = {}, user = {}, filter, tag } = props;
 
     const [popularFilter, setPopularFilter] = React.useState("week");
     const iteratePopularFilter = () => setPopularFilter(popularFilter => {
@@ -51,7 +56,13 @@ function Poms(props) {
         onToggleSaved: props.onToggleSaved,
     };
 
-    const subheaderText = `${(filter === "recents") ? "Latest" : (filter === "saved") ? "Saved" : "Your"}`;
+    const subheaderText = (filter === "recents")
+    ?
+        "Latest"
+    :
+        (filter === "saved") ? "Saved" : "Your";
+
+    const chip = tag ? <Chip size="medium" label={<Emoji emoji={tag} native size={12}/>} onDelete={() => props.setTag(null)}/> : null;
 
     const showSaved = !!(filter !== "uploads" && user && !user.isEmpty);
 
@@ -63,6 +74,7 @@ function Poms(props) {
         showDelete: !!(filter === "uploads" && user && !user.isEmpty),
         showSaved,
         subheaderText,
+        chip,
         onClick: props.onClick,
         onDelete: props.onDelete,
         onToggleSaved: props.onToggleSaved,
@@ -83,7 +95,7 @@ function Poms(props) {
     return (
         <>
             <Typography component="div" variant="h4" style={{marginTop: 20, marginBottom: 20}}>Pomodoro Playlists</Typography>
-            {filter === "recents" && popular && <PomList {...popularListProps} />}
+            {!tag && filter === "recents" && popular && <PomList {...popularListProps} />}
             {recent && <Random {...randomProps} />}
             {recent &&
             <InfiniteScroll
@@ -100,4 +112,4 @@ function Poms(props) {
     );
 }
 
-export default Poms;
+export default connect(state => ({ tag: state.client.tag }), dispatch => bindActionCreators({ setTag }, dispatch))(Poms);

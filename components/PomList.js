@@ -63,6 +63,7 @@ class PomList extends React.Component {
             showDelete,
             showSaved,
             subheaderText,
+            chip,
             favourites,
             remainingSyncs,
             onClick,
@@ -81,10 +82,13 @@ class PomList extends React.Component {
             subheader={
                 <ListSubheader className={classes.subheader}>
                     {_onToggleType && <div style={{display: 'flex', alignItems:'center'}}><Button style={{padding: 1, marginRight: 5, minWidth:'0px'}} onClick={onToggleType}>{subheaderText}</Button> Poms ({total})</div>}
-                    {!_onToggleType && <div>{subheaderText} Poms ({total})</div>}
-                    <Button className={classes.toggle} onClick={this.handleToggle}>
-                        {unfoldLess ? <UnfoldLessIcon /> : <UnfoldMoreIcon />}
-                    </Button>
+                    {!_onToggleType && <div style={{display: 'flex', alignItems:'center'}}>{subheaderText}<> Poms ({total})</></div>}
+                    <div>
+                        {chip}
+                        <Button className={classes.toggle} onClick={this.handleToggle}>
+                            {unfoldLess ? <UnfoldLessIcon /> : <UnfoldMoreIcon />}
+                        </Button>
+                    </div>
                 </ListSubheader>
             }
         >

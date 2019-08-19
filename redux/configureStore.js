@@ -10,8 +10,11 @@ import batchedSubscribeEnhancer from './batching/enhancer'
 import { reactReduxFirebase, firebaseReducer, getFirebase} from 'react-redux-firebase'
 import { getFirebase as getFirebaseApp } from '../db';
 
+import clientReducer from './client';
+
 const rootReducer = combineReducers({
 	firebase: firebaseReducer,
+	client: clientReducer,
 })
 
 export const initialState = {

@@ -17,9 +17,12 @@ export const selectPomData = pom => {
         tracks: _tracks = [],
     } = spotify;
     const {items = []} = _tracks;
-    const tracks = items.map(({track : {name, duration_ms, uri}}) => ({
+    const tracks = items.map(({track : {name, duration_ms, uri, artists, album}}) => ({
         title: name,
+        artists: artists.map((artist) => artist.name),
+        album: album.name,
         duration: `${Math.floor(duration_ms/1000/60)}:${(Math.round(duration_ms/1000%60)+'').padStart(2, '0')}`,
+        duration_ms,
         uri,
     }));
     const imageSrc = images && ((images.length > 1 && images[1].url) || (images.length > 0 && images[0].url) || null);

@@ -12,6 +12,7 @@ import { Chip } from '@material-ui/core';
 import { bindActionCreators } from 'redux';
 import { setTag } from '../redux/client';
 
+import TagView from './TagView';
 
 function Poms(props) {
 
@@ -96,8 +97,9 @@ function Poms(props) {
         <>
             <Typography component="div" variant="h4" style={{marginTop: 20, marginBottom: 20}}>Pomodoro Playlists</Typography>
             {!tag && filter === "recents" && popular && <PomList {...popularListProps} />}
-            {recent && <Random {...randomProps} />}
-            {recent &&
+            {filter === "tags" && <TagView />}
+            {filter !== "tags" && recent && <Random {...randomProps} />}
+            {filter !== "tags" && recent &&
             <InfiniteScroll
                 pageStart={0}
                 loadMore={() => {

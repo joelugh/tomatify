@@ -29,6 +29,7 @@ function Tags(props) {
         addButton = false,
         deleteButton = false,
         tags = {},
+        allTags = {},
         setTag = () => {},
     } = props;
 
@@ -60,7 +61,9 @@ function Tags(props) {
         "Tomato": true,
     }
 
-
+    const recent = !allTags ? [] : Object.keys(allTags)
+        .filter(tag => !!!special[tag])
+        .sort((a,b) => Object.keys(allTags[b]).length - Object.keys(allTags[a]));
 
     const canAdd = addButton && (!tags || Object.keys(tags).filter(tag=>!special[tag]).length < 3);
 
@@ -84,9 +87,9 @@ function Tags(props) {
                         db.ref(`tags/${tag.id}/${id}`).set(true);
                         db.ref(`tagsById/${id}/${tag.id}`).set(true);
                     }}
-                    recent={["the_horns","saxophone","musical_keyboard","coffee","popcorn","musical_score"]}
+                    recent={recent}
                     emojisToShowFilter={emoji => {
-                    return !!!reserved[emoji.name];
+                        return !!!reserved[emoji.name];
                     }}
                     title={"Pom Tags"}
                     emoji={"tomato"}
@@ -137,10 +140,12 @@ Tags.propTypes = {
 
 const ConnectedTags = compose(
     firebaseConnect(props => ([
-        `tagsById/${props.id}`
+        `tagsById/${props.id}`,
+        `tags`,
     ])),
     connect((state, _props) => ({
         tags: _props.id && state.firebase.data.tagsById && state.firebase.data.tagsById[_props.id],
+        allTags: _props.id && state.firebase.data.tags,
     }),
     dispatch => bindActionCreators({setTag}, dispatch)
     ),

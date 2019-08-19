@@ -7,6 +7,7 @@ import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
 import RestoreIcon from '@material-ui/icons/Restore';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import TagFacesIcon from '@material-ui/icons/TagFaces';
 
 const styles = {
     container: {
@@ -36,6 +37,7 @@ class LabelBottomNavigation extends React.Component {
                 <div className={classes.container}>
             <BottomNavigation value={value} onChange={this.handleChange} className={classes.root}>
                 <BottomNavigationAction label="Recents" value="recents" icon={<RestoreIcon />} />
+                <BottomNavigationAction label="Tags" value="tags" icon={<TagFacesIcon />} />
                 <BottomNavigationAction label="Saved" value="saved" icon={<FavoriteIcon />} />
                 <BottomNavigationAction label="Uploads" value="uploads" icon={<AccountCircleIcon />} />
             </BottomNavigation>

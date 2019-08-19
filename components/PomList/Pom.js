@@ -15,17 +15,17 @@ import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 
-import ExpansionPanel from './ExpansionPanel';
-import ExpansionPanelSummary from './ExpansionPanelSummary';
-import ExpansionPanelDetails from './ExpansionPanelDetails';
+import ExpansionPanel from '../ExpansionPanel';
+import ExpansionPanelSummary from '../ExpansionPanelSummary';
+import ExpansionPanelDetails from '../ExpansionPanelDetails';
 
-import TrackList from './TrackList';
-import DeleteButton from './DeleteButton';
-import SyncButton from './SyncButton';
-import { selectPomData } from '../utils';
+import TrackList from '../TrackList';
+import DeleteButton from '../DeleteButton';
+import SyncButton from '../SyncButton';
+import { selectPomData } from '../../utils';
 
-import Tags from './Tags';
-import PomDrawer from './PomDrawer';
+import Tags from '../Tags';
+import PomDrawer from '../PomDrawer';
 
 const styles = theme => ({
     root: {

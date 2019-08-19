@@ -1,7 +1,7 @@
 import React from 'react';
-import { connect } from 'react-redux'
-import { compose } from 'redux'
-import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase'
+import { connect } from 'react-redux';
+import { compose, bindActionCreators } from 'redux';
+import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase';
 import PropTypes from 'prop-types';
 
 import { withStyles } from '@material-ui/core/styles';
@@ -18,6 +18,8 @@ import { selectPomData } from '../../utils';
 
 import Tags from '../Tags';
 import PomDrawer from '../PomDrawer';
+
+import { playPom, toggleSavedPom } from '../../redux/firebase';
 
 const styles = theme => ({
     root: {
@@ -96,16 +98,26 @@ function RandomCard(props) {
     const {
         classes,
         id,
-        isFavourite,
-        onClick,
-        onToggleSaved,
+        play: _play = () => {},
+        toggleSaved: _toggleSaved = () => {},
         onRandomise: _onRandomise,
         pom,
+        user,
     } = props;
 
     const onRandomise = (e) => {
         e.stopPropagation();
         _onRandomise(e);
+    }
+
+    const play = (e) => {
+        e.stopPropagation();
+        _play(e);
+    }
+
+    const toggleSaved = (e) => {
+        e.stopPropagation();
+        _toggleSaved(e);
     }
 
     const {
@@ -116,12 +128,14 @@ function RandomCard(props) {
         userName = '',
     } = pom ? selectPomData(pom) : {};
 
+    const isSaved = user && user.saved && user.saved[id];
+
     return (
         <div className={classes.root}>
         <Card className={classes.card}>
             <PomDrawer id={id} className={classes.details}>
                 <CardContent className={classes.content}>
-                    <Typography variant="h6" onClick={onClick}>
+                    <Typography variant="h6">
                         {title}
                     </Typography>
                     <div style={{display:'flex', alignItems:'center'}}>
@@ -139,8 +153,8 @@ function RandomCard(props) {
                         <IconButton aria-label="Refresh" className={classes.refreshButton} onClick={onRandomise}>
                             <RefreshIcon className={classes.icon} />
                         </IconButton>
-                        <IconButton aria-label="Favourite" className={classes.favouriteButton} onClick={onToggleSaved}>
-                            {isFavourite ? <FavoriteIcon className={classes.icon} /> : <FavoriteBorderIcon className={classes.icon}/>}
+                        <IconButton aria-label="Favourite" className={classes.favouriteButton} onClick={toggleSaved}>
+                            {isSaved ? <FavoriteIcon className={classes.icon} /> : <FavoriteBorderIcon className={classes.icon}/>}
                         </IconButton>
                         <div className={classes.tags}>
                             <Tags id={id}/>
@@ -155,7 +169,7 @@ function RandomCard(props) {
             >
                 <IconButton
                     aria-label="Play/pause"
-                    onClick={onClick}
+                    onClick={play}
                 >
                     <PlayArrowIcon className={classes.playIcon} />
                 </IconButton>
@@ -174,9 +188,16 @@ const ConnectedRandomCard =  compose(
     firebaseConnect(props => ([
         `pom/${props.id}`,
     ])),
-    connect((state, _props) => ({
-        pom: _props.id && state.firebase.data.pom && state.firebase.data.pom[_props.id],
-    })),
+    connect(
+        (state, _props) => ({
+            pom: _props.id && state.firebase.data.pom && state.firebase.data.pom[_props.id],
+            user: state.firebase.profile,
+        }),
+        (dispatch, ownProps) => bindActionCreators({
+            toggleSaved: () => toggleSavedPom(ownProps.id),
+            play: () => playPom(ownProps.id),
+        }, dispatch)
+    ),
 )(RandomCard);
 
 export default withStyles(styles, { withTheme: true })(ConnectedRandomCard);

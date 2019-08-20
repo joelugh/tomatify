@@ -179,19 +179,28 @@ const calcTags = () => {
             let isAlbumPom = tracks.length > 0;
             const artists = tracks.length > 0 ? tracks[0].artists : [];
             const album = tracks.length > 0 ? tracks[0].album : '';
+            let validTracks = 0;
             tracks.forEach(track => {
+                if (track.duration_ms <= 1000*60) return;
+                validTracks++;
                 let foundArtist = false;
                 let foundAlbum = false;
+                if (track.album == album) foundAlbum = true;
                 artists.forEach(artist => {
-                    if (track.artists.indexOf(artist) !== -1 || track.duration_ms <= 1000*60) foundArtist = true;
-                    if (track.album == album || track.duration_ms <= 1000*60) foundAlbum = true;
-                    if (!foundArtist) {
-                        if (track.title.indexOf(artist) !== -1 && (/remix/i).test(track.title)) foundArtist = true;
-                    }
+                    if (
+                        (track.artists.indexOf(artist) !== -1)
+                        ||
+                        (track.title.indexOf(artist) !== -1 && (/remix/i).test(track.title))
+                    ) foundArtist = true;
                 })
                 if (!foundArtist) isArtistPom = false;
                 if (!foundAlbum) isAlbumPom = false;
             })
+
+            if (validTracks < 3) {
+                isArtistPom = false;
+                isAlbumPom = false;
+            }
 
             let isNewPom = (db.popular && db.popular["week"]) ? db.popular["week"].slice(0,20).reduce((bool, p) => bool || p.id == pomId, false) : false;
             let isHotPom = (db.popular && db.popular["month"]) ? db.popular["month"].slice(0,20).reduce((bool, p) => bool || p.id == pomId, false) : false;

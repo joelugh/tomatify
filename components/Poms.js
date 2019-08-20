@@ -13,12 +13,37 @@ import { bindActionCreators } from 'redux';
 import { setTag } from '../redux/client';
 
 import TagView from './TagView';
+import Loading from './Loading';
+
+const INIT_NUM_LOAD = 5;
+const INC_NUM_LOAD = 5;
+const LOAD_DELAY_MS = 1000;
 
 function Poms(props) {
 
     const { recent = {}, popular = {}, user = {}, filter, tag } = props;
 
+    const [loaded, setLoaded] = React.useState(false);
+
+    const [numLoaded, setNumLoaded] = React.useState(INIT_NUM_LOAD);
+
     const [popularFilter, setPopularFilter] = React.useState("week");
+
+    React.useEffect(() => {
+        setLoaded(false);
+        setTimeout(() => setLoaded(true), LOAD_DELAY_MS);
+        setNumLoaded(INIT_NUM_LOAD);
+    }, [filter])
+
+    const headingComponent = <Typography component="div" variant="h4" style={{marginTop: 20, marginBottom: 20}}>Pomodoro Playlists</Typography>;
+
+    if (!loaded) {
+        return <>
+            {headingComponent}
+            <Loading />
+        </>
+    }
+
     const iteratePopularFilter = () => setPopularFilter(popularFilter => {
         if (popularFilter === "week") return "month";
         if (popularFilter === "month") return "all";
@@ -35,12 +60,6 @@ function Poms(props) {
         month: 8,
         all: 10,
     }
-
-    const [numLoaded, setNumLoaded] = React.useState(15);
-
-    React.useEffect(() => {
-        setNumLoaded(15);
-    }, [filter])
 
     let pomIds = (recent && recent["all"]) || [];
     if (user) {
@@ -95,7 +114,7 @@ function Poms(props) {
 
     return (
         <>
-            <Typography component="div" variant="h4" style={{marginTop: 20, marginBottom: 20}}>Pomodoro Playlists</Typography>
+            {headingComponent}
             {!tag && filter === "recents" && popular && <PomList {...popularListProps} />}
             {filter === "tags" && <TagView />}
             {filter !== "tags" && recent && <Random {...randomProps} />}
@@ -103,7 +122,7 @@ function Poms(props) {
             <InfiniteScroll
                 pageStart={0}
                 loadMore={() => {
-                    setNumLoaded(numLoaded + 10);
+                    setNumLoaded(numLoaded => numLoaded + INC_NUM_LOAD);
                 }}
                 hasMore={numLoaded < pomIds.length}
                 loader={<div className="loader" style={{display:'flex', justifyContent: 'center', width: '100%', padding: '20px 20px 30px 20px'}} key={0}>Loading ...</div>}

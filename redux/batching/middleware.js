@@ -5,10 +5,9 @@ const actionsPrefix = '@@reactReduxFirebase';
 
 const debounceNotify = _.debounce(() => State.notify());
 
-const shouldBatch = actionWrapper => {
-  const type = _.get(actionWrapper, 'action.type', '');
-  const skipBatch = _.get(actionWrapper, 'action.__skip_batch', false);
-  // if (skipBatch) console.log('skipping batch for:', type, actionWrapper.action);
+const shouldBatch = action => {
+  const type = _.get(action, 'type', '');
+  const skipBatch = _.get(action, '__skip_batch', false);
   return type.startsWith(actionsPrefix) && !skipBatch;
 };
 

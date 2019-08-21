@@ -51,14 +51,14 @@ function Poms(props) {
         return "week";
     })
     const subheaderTextLookup = {
-        week: "New",
-        month: "Hot",
-        all: "Top",
+        week: "Top (Week)",
+        month: "Top (Month)",
+        all: "Top (All-time)",
     };
     const sliceLookup = {
         week: 5,
-        month: 8,
-        all: 10,
+        month: 5,
+        all: 5,
     }
 
     let pomIds = (recent && recent["all"]) || [];

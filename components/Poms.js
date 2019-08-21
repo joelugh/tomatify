@@ -16,7 +16,7 @@ import TagView from './TagView';
 import Loading from './Loading';
 
 const INIT_NUM_LOAD = 5;
-const INC_NUM_LOAD = 5;
+const INC_NUM_LOAD = 10;
 const LOAD_DELAY_MS = 1000;
 
 function Poms(props) {

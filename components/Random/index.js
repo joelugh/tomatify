@@ -2,45 +2,65 @@ import React from 'react';
 
 import Random from './Random';
 
+function shuffle(_array = []) {
+    const array = [..._array];
+    var currentIndex = array.length, temporaryValue, indexIndex;
+
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+
+      // Pick a remaining element...
+      indexIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+
+      // And swap it with the current element.
+      temporaryValue = array[currentIndex];
+      array[currentIndex] = array[indexIndex];
+      array[indexIndex] = temporaryValue;
+    }
+    return array;
+  }
+
 class RandomCard extends React.Component {
 
     state = {
-        random: null,
+        index: null,
+        shuffledIds: [],
     }
 
     componentDidMount() {
-        this.randomise();
+        this.update();
     }
 
     componentDidUpdate(prevProps) {
-        const {random} = this.state;
-        const {pomIds=[]} = this.props;
-        if (random === null && pomIds.length === 0) return;
-        if (random === 0 && pomIds.length === 1) return;
-        if (random === null || random >= pomIds.length) this.randomise();
+        const {pomIds} = this.props;
+        if (pomIds !== prevProps.pomIds) this.update();
     }
 
-    randomise = () => {
-        const {pomIds} = this.props;
-        let random = this.state.random;
-        if (pomIds.length === 0) {
-            random = null;
-        } else if (pomIds.length === 1) {
-            random = 0;
-        } else if (random === null) {
-            random = Math.floor(Math.random() * pomIds.length);
+    update = () => this.setState(() => {
+        const {pomIds=[]} = this.props;
+        const index = (pomIds.length === 0) ? null : 0;
+        return {index, shuffledIds: shuffle(pomIds)}
+    });
+
+    next = () => this.setState(({index, shuffledIds}) => {
+        if (shuffledIds.length === 0) {
+            index = null;
+        } else if (shuffledIds.length === 1) {
+            index = 0;
+        } else if (index === null) {
+            index = 0;
         } else {
-            while (random === this.state.random) {
-                random = Math.floor(Math.random() * pomIds.length);
-            }
+            index = (index + 1) % shuffledIds.length;
         }
-        this.setState({ random });
-    }
+        return { index };
+    })
 
     render() {
 
         const {
-            random,
+            index,
+            shuffledIds,
         } = this.state;
 
         const {
@@ -50,9 +70,11 @@ class RandomCard extends React.Component {
             pomIds,
         } = this.props;
 
-        if (random === null || random >= pomIds.length) return null;
+        if (index === null || index >= shuffledIds.length) return null;
 
-        const id = pomIds[random];
+        const id = shuffledIds[index];
+
+        if (pomIds.indexOf(id) === -1) return null;
 
         const isFavourite = favourites[id];
 
@@ -64,7 +86,7 @@ class RandomCard extends React.Component {
             isFavourite={isFavourite}
             onClick={onClick}
             onToggleSaved={onToggleSaved}
-            onRandomise={this.randomise}
+            onRandomise={this.next}
         />;
     }
 }

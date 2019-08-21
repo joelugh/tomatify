@@ -253,10 +253,7 @@ class Home extends React.Component {
             {isUser && <BottomNav
                 value={filter}
                 onChange={filter => {
-                    window.scrollTo(0,0);
-                    setTimeout(() => {
-                        setFilter(filter);
-                    },0)
+                    setFilter(filter);
                 }}
             />}
         </>;

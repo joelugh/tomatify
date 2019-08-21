@@ -15,38 +15,22 @@ import { setTag } from '../redux/client';
 import { getDB } from '../db';
 
 const styles = theme => ({
-    tags: {
-        // display: 'flex',
-        // position: 'absolute',
-    }
+
 });
 
-function Tags(props) {
+const special = {
+    "fire": true,
+    "cd": true,
+    "microphone": true,
+    "hatching_chick": true,
+    "100": true,
+}
 
-    const {
-        classes,
-        id,
-        addButton = false,
-        deleteButton = false,
-        tags = {},
-        allTags = {},
-        setTag = () => {},
-    } = props;
-
-    const onClickTag = (e,tag) => {
-        e.stopPropagation();
-        setTag(tag);
-    }
-
-    const [open, setOpen] = React.useState(false);
-
-    const special = {
-        "fire": true,
-        "cd": true,
-        "microphone": true,
-        "hatching_chick": true,
-        "100": true,
-    }
+function WrappedPicker({
+    id,
+    tags = {},
+    setOpen = () => {},
+}) {
 
     const reserved = {
         "Fire": true,
@@ -61,9 +45,55 @@ function Tags(props) {
         "Tomato": true,
     }
 
-    const recent = !allTags ? [] : Object.keys(allTags)
+    const recent = !tags ? [] : Object.keys(tags)
         .filter(tag => !!!special[tag])
-        .sort((a,b) => Object.keys(allTags[b]).length - Object.keys(allTags[a]).length);
+        .sort((a,b) => Object.keys(tags[b]).length - Object.keys(tags[a]).length);
+
+    return <Picker
+        onSelect={tag => {
+            setOpen(false)
+            const db = getDB();
+            db.ref(`tags/${tag.id}/${id}`).set(true);
+            db.ref(`tagsById/${id}/${tag.id}`).set(true);
+        }}
+        recent={recent}
+        emojisToShowFilter={emoji => {
+            return !!!reserved[emoji.name];
+        }}
+        title={"Pom Tags"}
+        emoji={"tomato"}
+        notFoundEmoji={"tomato"}
+        showSkinTones={false}
+    />
+}
+
+const ConnectedPicker = compose(
+    firebaseConnect([
+        'tags',
+    ]),
+    connect((state) => ({
+        tags: state.firebase.data.tags,
+    })),
+)(WrappedPicker);
+
+
+function Tags(props) {
+
+    const {
+        classes,
+        id,
+        addButton = false,
+        deleteButton = false,
+        tags = {},
+        setTag = () => {},
+    } = props;
+
+    const onClickTag = (e,tag) => {
+        e.stopPropagation();
+        setTag(tag);
+    }
+
+    const [open, setOpen] = React.useState(false);
 
     const canAdd = addButton && (!tags || Object.keys(tags).filter(tag=>!special[tag]).length < 3);
 
@@ -78,24 +108,8 @@ function Tags(props) {
                 e.stopPropagation();
                 setOpen(false)
             }} aria-labelledby="simple-dialog-title" open={open}>
-                {/* <DialogTitle id="simple-dialog-title">Set backup account</DialogTitle> */}
                 <div onClick={e => e.stopPropagation()}>
-                <Picker
-                    onSelect={tag => {
-                        setOpen(false)
-                        const db = getDB();
-                        db.ref(`tags/${tag.id}/${id}`).set(true);
-                        db.ref(`tagsById/${id}/${tag.id}`).set(true);
-                    }}
-                    recent={recent}
-                    emojisToShowFilter={emoji => {
-                        return !!!reserved[emoji.name];
-                    }}
-                    title={"Pom Tags"}
-                    emoji={"tomato"}
-                    notFoundEmoji={"tomato"}
-                    showSkinTones={false}
-                />
+                    <ConnectedPicker setOpen={setOpen} id={id} />
                 </div>
             </Dialog>}
             <>
@@ -141,11 +155,9 @@ Tags.propTypes = {
 const ConnectedTags = compose(
     firebaseConnect(props => ([
         `tagsById/${props.id}`,
-        `tags`,
     ])),
     connect((state, _props) => ({
         tags: _props.id && state.firebase.data.tagsById && state.firebase.data.tagsById[_props.id],
-        allTags: _props.id && state.firebase.data.tags,
     }),
     dispatch => bindActionCreators({setTag}, dispatch)
     ),

@@ -40,14 +40,12 @@ function TagView({
     return (
         <List style={root}>
             {Object.keys(tags).sort((a,b) => Object.keys(tags[b]).length - Object.keys(tags[a]).length).map(tag => {
-                return <>
-                <ListItem style={listItem}>
+                return <ListItem key={tag} style={listItem}>
                     <div style={{paddingLeft: 25}}>
                         <Emoji native emoji={tag} size={16} />
                     </div>
                     <Random {...randomProps} pomIds={Object.keys(tags[tag])}/>
                 </ListItem>
-                </>
             })}
         </List>
     );

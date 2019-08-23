@@ -100,7 +100,7 @@ const calcRecent = (request, response) => {
 }
 
 const calcPopular = (context) => {
-    const SAVED_MULTIPLIER = 20;
+    const SAVED_MULTIPLIER = 1000;
     const dbRef = admin.database().ref();
     return dbRef.once("value")
     .then(snapshot => {

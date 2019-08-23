@@ -29,13 +29,27 @@ function Poms(props) {
 
     const [popularFilter, setPopularFilter] = React.useState("week");
 
+    const [uploadsFilter, setUploadsFilter] = React.useState("uploads");
+
     React.useEffect(() => {
         setLoaded(false);
         setTimeout(() => setLoaded(true), LOAD_DELAY_MS);
         setNumLoaded(INIT_NUM_LOAD);
-    }, [filter])
+    }, [filter, uploadsFilter]);
 
-    const headingComponent = <Typography component="div" variant="h4" style={{marginTop: 20, marginBottom: 20}}>Pomodoro Playlists</Typography>;
+    const uploadsToggle = <div style={{display:'flex'}}>
+        <div style={{marginLeft: 10, marginRight: 10, color: uploadsFilter === "uploads" ? 'black' : 'lightgrey', userSelect: 'none'}} onClick={() => setUploadsFilter("uploads")}><Typography variant="h5">
+            Yours
+        </Typography></div>
+        <div style={{marginLeft: 10, marginRight: 10, color: uploadsFilter === "saved" ? 'black' : 'lightgrey', userSelect: 'none'}} onClick={() => setUploadsFilter("saved")}><Typography variant="h5">
+            Liked
+        </Typography></div>
+    </div>
+
+    const headingComponent = <>
+        <Typography component="div" variant="h4" style={{marginTop: 20, marginBottom: 20}}>Pomodoro Playlists</Typography>
+        {filter === "uploads" && uploadsToggle}
+    </>;
 
     if (!loaded) {
         return <>
@@ -63,8 +77,8 @@ function Poms(props) {
 
     let pomIds = (recent && recent["all"]) || [];
     if (user) {
-        if (pomIds && filter === "uploads") pomIds = pomIds.filter(id => user.poms && user.poms[id]);
-        if (pomIds && filter === "saved") pomIds = pomIds.filter(id => user.saved && user.saved[id]);
+        if (pomIds && filter === "uploads" && uploadsFilter === "uploads") pomIds = pomIds.filter(id => user.poms && user.poms[id]);
+        if (pomIds && filter === "uploads" && uploadsFilter === "saved") pomIds = pomIds.filter(id => user.saved && user.saved[id]);
     }
 
     const popularIds = !popular || !popular[popularFilter] ? [] : popular[popularFilter].map(o => o.id).slice(0,sliceLookup[popularFilter]);
@@ -80,18 +94,19 @@ function Poms(props) {
     ?
         "Latest"
     :
-        (filter === "saved") ? "Saved" : "Your";
+        (uploadsFilter === "uploads") ? "Your" : "Saved";
 
     const chip = tag ? <Chip size="medium" label={<Emoji emoji={tag} native size={12}/>} onDelete={() => props.setTag(null)}/> : null;
 
-    const showSaved = !!(filter !== "uploads" && user && !user.isEmpty);
+    const showSaved = !!!((filter === "uploads" && uploadsFilter === "uploads") || (user && user.isEmpty));
 
     const listProps = {
         favourites: (user && user.saved) || {},
         remainingSyncs: (user && user.syncs && user.syncs.count) || 0,
         pomIds: pomIds.slice(0,numLoaded),
         total: pomIds.length,
-        showDelete: !!(filter === "uploads" && user && !user.isEmpty),
+        canEdit: !!(filter === "uploads"  && uploadsFilter === "uploads" && user && !user.isEmpty),
+        showDelete: !!(filter === "uploads"  && uploadsFilter === "uploads" && user && !user.isEmpty),
         showSaved,
         subheaderText,
         chip,
@@ -111,6 +126,7 @@ function Poms(props) {
         favourites: (user && user.saved) || {},
         onToggleSaved: props.onToggleSaved,
     }
+
 
     return (
         <>

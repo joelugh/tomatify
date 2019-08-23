@@ -89,6 +89,7 @@ function ExpandingPom({
     classes,
     id,
     pom = {},
+    canEdit,
     isFavourite,
     divider = false,
     expanded = false,
@@ -137,7 +138,7 @@ function ExpandingPom({
     const date = new Date(0); // The 0 sets the date to the epoch
     date.setUTCSeconds(lastModified/1000);
 
-    const canModifyTags = filter === "uploads";
+    const canModifyTags = filter === "uploads" && canEdit;
 
     return (
         <>

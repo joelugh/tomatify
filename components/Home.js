@@ -226,7 +226,6 @@ class Home extends React.Component {
                     minHeight:'90vh',
                     display:'flex',
                     flexDirection:'column',
-                    justifyContent: 'center',
                     alignItems: 'center',
                 }}
             >

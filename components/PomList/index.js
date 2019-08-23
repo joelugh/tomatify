@@ -60,6 +60,7 @@ class PomList extends React.Component {
             classes,
             pomIds,
             total,
+            canEdit,
             showDelete,
             showSaved,
             subheaderText,
@@ -99,6 +100,7 @@ class PomList extends React.Component {
                     id={id}
                     expanded={all || expanded === idx}
                     handleExpand={() => this.handleExpand(idx)}
+                    canEdit={canEdit}
                     isFavourite={isFavourite}
                     onClick={() => onClick(id)}
                     onDelete={() => onDelete(id)}

@@ -58,6 +58,21 @@ function Poms(props) {
         </>
     }
 
+    if (filter === "uploads" && !user) {
+        return <>
+            {headingComponent}
+            <div style={{padding:20}}>
+                <Typography>
+                    {(uploadsFilter === "uploads") ?
+                        "Please sign in to upload your own poms"
+                        :
+                        "Please sign in to like poms"
+                    }
+                </Typography>
+            </div>
+        </>
+    }
+
     const iteratePopularFilter = () => setPopularFilter(popularFilter => {
         if (popularFilter === "week") return "month";
         if (popularFilter === "month") return "all";
@@ -77,6 +92,7 @@ function Poms(props) {
 
     let pomIds = (recent && recent["all"]) || [];
     if (user) {
+        // TODO: Need to pass same refs to prevent rerenders of random component
         if (pomIds && filter === "uploads" && uploadsFilter === "uploads") pomIds = pomIds.filter(id => user.poms && user.poms[id]);
         if (pomIds && filter === "uploads" && uploadsFilter === "saved") pomIds = pomIds.filter(id => user.saved && user.saved[id]);
     }

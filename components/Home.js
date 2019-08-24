@@ -240,7 +240,7 @@ class Home extends React.Component {
                     <Poms
                         recent={recent}
                         popular={popular}
-                        user={user}
+                        user={isUser && user}
                         onSync={this.handleSync}
                         onClick={this.handleClick}
                         onToggleSaved={this.handleToggleSaved}
@@ -249,12 +249,10 @@ class Home extends React.Component {
                     />
                 </>}
             </div>
-            {isUser && <BottomNav
+            <BottomNav
                 value={filter}
-                onChange={filter => {
-                    setFilter(filter);
-                }}
-            />}
+                onChange={filter => setFilter(filter)}
+            />
         </>;
 
     }

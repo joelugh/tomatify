@@ -88,6 +88,7 @@ const styles = theme => ({
 function ExpandingPom({
     classes,
     id,
+    user,
     pom = {},
     canEdit,
     isFavourite,
@@ -137,6 +138,9 @@ function ExpandingPom({
 
     const date = new Date(0); // The 0 sets the date to the epoch
     date.setUTCSeconds(lastModified/1000);
+
+
+    const isUser = user && user.isLoaded && !user.isEmpty;
 
     const canModifyTags = filter === "uploads" && canEdit;
 
@@ -194,7 +198,7 @@ function ExpandingPom({
                         display: 'flex',
                         alignItems: 'center',
                     }}>
-                    {showSaved ? <IconButton aria-label="Favourite" onClick={onToggleSaved}>
+                    {isUser ? <IconButton aria-label="Favourite" onClick={onToggleSaved}>
                         {isFavourite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
                     </IconButton> : null}
                     {showSync ? <SyncButton onSync={onSync} title={title} remainingSyncs={remainingSyncs} /> : null}
@@ -228,6 +232,7 @@ const ConnectedExpandingPom =  compose(
     ])),
     connect((state, _props) => ({
         pom: _props.id && state.firebase.data.pom && state.firebase.data.pom[_props.id],
+        user: state.firebase.profile,
         filter: state.client.filter,
     })),
 )(ExpandingPom);

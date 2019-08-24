@@ -104,10 +104,14 @@ function Tags(props) {
 
     return (
         <>
-            {canAdd && <Dialog onClose={e => {
-                e.stopPropagation();
-                setOpen(false)
-            }} aria-labelledby="simple-dialog-title" open={open}>
+            {canAdd && <Dialog
+                onClose={e => {
+                    e.stopPropagation();
+                    setOpen(false)
+                }}
+                aria-labelledby="simple-dialog-title"
+                open={open}
+            >
                 <div onClick={e => e.stopPropagation()}>
                     <ConnectedPicker setOpen={setOpen} id={id} />
                 </div>

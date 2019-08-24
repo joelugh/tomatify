@@ -127,6 +127,7 @@ function RandomCard(props) {
         userName = '',
     } = pom ? selectPomData(pom) : {};
 
+    const isUser = user && user.isLoaded && !user.isEmpty;
     const isSaved = user && user.saved && user.saved[id];
 
     return (
@@ -152,9 +153,9 @@ function RandomCard(props) {
                         <IconButton aria-label="Refresh" className={classes.refreshButton} onClick={onRandomise}>
                             <RefreshIcon className={classes.icon} />
                         </IconButton>
-                        <IconButton aria-label="Favourite" className={classes.favouriteButton} onClick={toggleSaved}>
+                        {isUser && <IconButton aria-label="Favourite" className={classes.favouriteButton} onClick={toggleSaved}>
                             {isSaved ? <FavoriteIcon className={classes.icon} /> : <FavoriteBorderIcon className={classes.icon}/>}
-                        </IconButton>
+                        </IconButton>}
                         <div className={classes.tags}>
                             <Tags id={id}/>
                         </div>

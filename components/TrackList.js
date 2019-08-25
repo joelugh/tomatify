@@ -33,7 +33,7 @@
                 <TableRow>
                     <TableCell style={{width: widths[0]}} padding="none"><Typography variant="caption" >#</Typography></TableCell>
                     <TableCell style={{width: widths[1]}} align="left" padding="none" ><Typography variant="caption" >Title</Typography></TableCell>
-                    <TableCell style={{width: widths[2]}} align="right" padding="none"><Typography variant="caption" >Duration</Typography></TableCell>
+                    <TableCell style={{width: widths[2]}} align="right" padding="none"><Typography variant="caption" >To Go</Typography></TableCell>
                 </TableRow>
                 </TableHead>
                 <TableBody>
@@ -41,7 +41,7 @@
                     <TableRow key={idx} className={classes.row}>
                     <TableCell style={{width: widths[0]}} component="th" scope="row" padding="none"><Typography variant="caption" >{idx + 1}</Typography></TableCell>
                     <TableCell style={{width: widths[1]}} align="left" padding="none"><Typography variant="caption" component="div" noWrap>{track.title}</Typography></TableCell>
-                    <TableCell style={{width: widths[2]}} align="right" padding="none" ><Typography variant="caption" >{track.duration}</Typography></TableCell>
+                    <TableCell style={{width: widths[2]}} align="right" padding="none" ><Typography variant="caption" >{track.remaining}</Typography></TableCell>
                     </TableRow>
                 ))}
                 </TableBody>

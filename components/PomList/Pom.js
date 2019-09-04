@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { compose } from 'redux';
+import { compose, bindActionCreators } from 'redux';
 import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase';
 import PropTypes from 'prop-types';
 import Timestamp from 'react-timestamp';
@@ -25,7 +25,10 @@ import SyncButton from '../SyncButton';
 import { selectPomData } from '../../utils';
 
 import Tags from '../Tags';
-import PomDrawer from '../PomDrawer';
+import { setPomId } from '../../redux/client';
+import { syncPom, toggleSavedPom, playPom, deletePom } from '../../redux/firebase';
+import Router, { useRouter } from 'next/router';
+import Link from 'next/link';
 
 const styles = theme => ({
     root: {
@@ -60,6 +63,9 @@ const styles = theme => ({
         margin: 0,
     },
     content: {
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'space-between',
         '& > :last-child': { paddingRight: 0 },
     },
     details: {
@@ -95,15 +101,17 @@ function ExpandingPom({
     divider = false,
     expanded = false,
     filter,
-    onClick: _onClick = () => {},
-    onDelete: _onDelete = () => {},
-    onToggleSaved: _onToggleSaved = () => {},
-    onSync: _onSync = () => {},
+    playPom = () => {},
+    deletePom = () => {},
+    toggleSavedPom = () => {},
+    syncPom = () => {},
+    setPom = () => {},
     remainingSyncs = 0,
     showSaved = false,
     showSync = false,
     showDelete = false,
     handleExpand = () => {},
+    ...props
 }) {
 
     const {
@@ -118,93 +126,83 @@ function ExpandingPom({
 
     const onClick = e => {
         if (e) e.stopPropagation();
-        _onClick(e);
+        playPom();
     }
 
     const onDelete = e => {
         if (e) e.stopPropagation();
-        _onDelete(e);
+        deletePom();
     }
 
     const onToggleSaved = e => {
         if (e) e.stopPropagation();
-        _onToggleSaved(e);
+        toggleSavedPom();
     }
 
     const onSync = e => {
         if (e) e.stopPropagation();
-        _onSync(e);
+        syncPom();
     }
 
     const date = new Date(0); // The 0 sets the date to the epoch
     date.setUTCSeconds(lastModified/1000);
 
-
     const isUser = user && user.isLoaded && !user.isEmpty;
 
     const canModifyTags = filter === "uploads" && canEdit;
 
-    return (
-        <>
-        <ListItem alignItems="flex-start" className={classes.listItem}>
+    return <Link href="/pom/[id]" as={`/pom/${id}`}>
+        <ListItem
+            className={classes.listItem}
+        >
             <ExpansionPanel className={classes.panel} expanded={expanded}>
             <ExpansionPanelSummary classes={{root: classes.summary, content: classes.content}}>
-                <PomDrawer
-                    id={id}
+                <div
                     style={{
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'space-between',
-                        width: '100%',
+                        justifyContent: 'flex-start',
                     }}
                 >
-                    <div
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'flex-start',
-                        }}
-                    >
-                        <img src={imageSrc} className={classes.cover} />
-                        <IconButton aria-label="play" className={classes.playButton} onClick={onClick} >
-                            <PlayArrowIcon />
-                        </IconButton>
-                        <div style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            paddingLeft: 15,
-                            paddingRight: 15,
-                            width: 'auto',
-                        }}>
-                            <Typography variant="h6" style={{fontSize: '0.9em',}}>{title}</Typography>
-                            <div>
-                                <Typography component="span" variant="subtitle1" className={classes.inline} color="textPrimary" style={{fontSize: '0.75em',}}>
-                                {userName}
-                                </Typography>
-                                <Typography component="span" variant="subtitle1" className={classes.inline} color="textPrimary" style={{fontSize: '0.75em',}}>
-                                {` — ${duration} mins`}
-                                </Typography>
-                            <br />
-                            <Typography component="span" variant="subtitle1" className={classes.inline} color="textSecondary" style={{fontSize: '0.7em',}}>
-                                <Timestamp relative date={date} />
-                            </Typography>
-                            </div>
-                            <div>
-                               <Tags id={id} addButton={canModifyTags} deleteButton={canModifyTags} />
-                            </div>
-                        </div>
-                    </div>
+                    <img src={imageSrc} className={classes.cover} />
+                    <IconButton aria-label="play" className={classes.playButton} onClick={onClick} >
+                        <PlayArrowIcon />
+                    </IconButton>
                     <div style={{
                         display: 'flex',
-                        alignItems: 'center',
+                        flexDirection: 'column',
+                        paddingLeft: 15,
+                        paddingRight: 15,
+                        width: 'auto',
                     }}>
-                    {isUser ? <IconButton aria-label="Favourite" onClick={onToggleSaved}>
+                        <Typography variant="h6" style={{fontSize: '0.9em',}}>{title}</Typography>
+                        <div>
+                            <Typography component="span" variant="subtitle1" className={classes.inline} color="textPrimary" style={{fontSize: '0.75em',}}>
+                            {userName}
+                            </Typography>
+                            <Typography component="span" variant="subtitle1" className={classes.inline} color="textPrimary" style={{fontSize: '0.75em',}}>
+                            {` — ${duration} mins`}
+                            </Typography>
+                        <br />
+                        <Typography component="span" variant="subtitle1" className={classes.inline} color="textSecondary" style={{fontSize: '0.7em',}}>
+                            <Timestamp relative date={date} />
+                        </Typography>
+                        </div>
+                        <div>
+                            <Tags id={id} addButton={canModifyTags} deleteButton={canModifyTags} />
+                        </div>
+                    </div>
+                </div>
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                }}>
+                    {(isUser && showSaved) ? <IconButton aria-label="Favourite" onClick={onToggleSaved}>
                         {isFavourite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
                     </IconButton> : null}
                     {showSync ? <SyncButton onSync={onSync} title={title} remainingSyncs={remainingSyncs} /> : null}
                     {showDelete ? <DeleteButton onDelete={onDelete} title={title} /> : null}
-                    </div>
-                </PomDrawer>
+                </div>
             </ExpansionPanelSummary>
             <ExpansionPanelDetails className={classes.details}>
                 {description && <div className={classes.description}>
@@ -218,8 +216,7 @@ function ExpandingPom({
             </ExpansionPanel>
         {divider && <Divider />}
         </ListItem>
-        </>
-    );
+    </Link>;
 }
 
 ExpandingPom.propTypes = {
@@ -230,11 +227,20 @@ const ConnectedExpandingPom =  compose(
     firebaseConnect(props => ([
         `pom/${props.id}`,
     ])),
-    connect((state, _props) => ({
-        pom: _props.id && state.firebase.data.pom && state.firebase.data.pom[_props.id],
-        user: state.firebase.profile,
-        filter: state.client.filter,
-    })),
+    connect(
+        (state, _props) => ({
+            pom: _props.id && state.firebase.data.pom && state.firebase.data.pom[_props.id],
+            user: state.firebase.profile,
+            filter: state.client.filter,
+        }),
+        (dispatch, ownProps) => bindActionCreators({
+            playPom: () => playPom(ownProps.id),
+            deletePom: () => deletePom(ownProps.id),
+            syncPom: () => syncPom(ownProps.id),
+            toggleSavedPom: () => toggleSavedPom(ownProps.id),
+            setPom: () => setPomId(ownProps.id),
+        }, dispatch)
+    ),
 )(ExpandingPom);
 
 export default withStyles(styles)(ConnectedExpandingPom);

@@ -13,6 +13,7 @@ import { Dialog, Chip } from '@material-ui/core';
 import { setTag } from '../redux/client';
 
 import { getDB } from '../db';
+import Link from 'next/link';
 
 const styles = theme => ({
 
@@ -80,17 +81,14 @@ const ConnectedPicker = compose(
 function Tags(props) {
 
     const {
-        classes,
         id,
         addButton = false,
         deleteButton = false,
         tags = {},
-        setTag = () => {},
     } = props;
 
     const onClickTag = (e,tag) => {
         e.stopPropagation();
-        setTag(tag);
     }
 
     const [open, setOpen] = React.useState(false);
@@ -117,25 +115,28 @@ function Tags(props) {
                 </div>
             </Dialog>}
             <>
-                {specialTags.map(tag => tags[tag] && <Chip
-                    key={tag}
-                    size="small"
-                    variant="outlined"
-                    label={<span style={{fontSize:12}}><Emoji native emoji={tag} size={11} /></span>}
-                    onClick={e => onClickTag(e,tag)}
-                />)}
-                {otherTags.map(tag => tags[tag] && <Chip
-                    key={tag}
-                    size="small"
-                    variant="outlined"
-                    label={<span style={{fontSize:12}}><Emoji native emoji={tag} size={11} /></span>}
-                    onClick={e => onClickTag(e,tag)}
-                    onDelete={!deleteButton ? null : () => {
-                        const db = getDB();
-                        db.ref(`tags/${tag}/${id}`).remove();
-                        db.ref(`tagsById/${id}/${tag}`).remove();
-                    }}
-                />)}
+                {specialTags.map(tag => tags[tag] && <Link key={tag} href="/tags/[id]" as={`/tags/${tag}`}>
+                    <Chip
+                        size="small"
+                        variant="outlined"
+                        label={<span style={{fontSize:12}}><Emoji native emoji={tag} size={11} /></span>}
+                        onClick={e => onClickTag(e,tag)}
+                    />
+                </Link>)}
+                {otherTags.map(tag => tags[tag] && <Link key={tag} href="/tags/[id]" as={`/tags/${tag}`}>
+                    <Chip
+                        key={tag}
+                        size="small"
+                        variant="outlined"
+                        label={<span style={{fontSize:12}}><Emoji native emoji={tag} size={11} /></span>}
+                        onClick={e => onClickTag(e,tag)}
+                        onDelete={!deleteButton ? null : () => {
+                            const db = getDB();
+                            db.ref(`tags/${tag}/${id}`).remove();
+                            db.ref(`tagsById/${id}/${tag}`).remove();
+                        }}
+                    />
+                </Link>)}
                 {canAdd && <Chip
                     size="small"
                     variant="outlined"

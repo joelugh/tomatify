@@ -120,11 +120,11 @@ const calcPopular = (context) => {
 
         });
         const top = Object.keys(pomScores).map(pomId => [pomId, pomScores[pomId]]).sort((a,b) => b[1]-a[1]).map(o => ({ id: o[0], score: o[1] }));
-        const topAll = top.filter(o => db.pom && db.pom[o.id]).slice(0,20);
+        const topAll = top.filter(o => db.pom && db.pom[o.id]);
         const oneMonthMillis = 1000*60*60*24*30;
         const oneWeekMillis = 1000*60*60*24*7;
-        const topMonth = top.filter(o => db.pom && Date.now() - db.pom[o.id].createTime < oneMonthMillis).slice(0,20);
-        const topWeek = top.filter(o => db.pom && Date.now() - db.pom[o.id].createTime < oneWeekMillis).slice(0,20);
+        const topMonth = top.filter(o => db.pom && Date.now() - db.pom[o.id].createTime < oneMonthMillis);
+        const topWeek = top.filter(o => db.pom && Date.now() - db.pom[o.id].createTime < oneWeekMillis);
         return Promise.all([
             admin.database().ref("popular/all").set(topAll),
             admin.database().ref("popular/month").set(topMonth),

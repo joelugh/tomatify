@@ -1,9 +1,18 @@
 const SET_TAG = 'CLIENT/SET_TAG';
 const SET_FILTER = 'CLIENT/SET_FILTER';
+const SET_POM_ID = 'CLIENT/SET_POM_ID';
 
 export const clientInitialState = {
   tag: null,
-  filter: 'recents',
+  pomId: null,
+  filter: 'home',
+};
+
+export const setPomId = pomId => {
+  return {
+    type: SET_POM_ID,
+    payload: pomId,
+  }
 };
 
 export const setTag = tagId => {
@@ -26,6 +35,8 @@ export default (state = clientInitialState, {type, payload}) => {
       return {...state, tag: payload};
     case SET_FILTER:
       return {...state, filter: payload};
+    case SET_POM_ID:
+      return {...state, pomId: payload};
     default:
       return state;
   }

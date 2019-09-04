@@ -1,12 +1,13 @@
 import React from 'react';
 
-import Home from '../components/Home';
+import HomeView from '../components/HomeView';
+import Layout from '../components/Layout';
 
 function Index() {
 
-    return (
-        <Home />
-    );
+    return <Layout>
+        <HomeView />
+    </Layout>;
 
 }
 

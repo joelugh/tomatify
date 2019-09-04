@@ -1,6 +1,10 @@
 import React from 'react';
 import axios from 'axios';
 import he from 'he';
+import { connect } from 'react-redux';
+import { compose, bindActionCreators } from 'redux';
+import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase';
+
 import PropTypes from 'prop-types';
 
 import { withStyles } from '@material-ui/core/styles';
@@ -14,6 +18,7 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 
 import config from '../config';
 import Loading from './Loading';
+import { addPom } from '../redux/firebase';
 
 const AddStyles = theme => ({
     container: {
@@ -112,7 +117,7 @@ class Add extends React.Component {
     }
 
     handleAdd = () => {
-        this.props.onAdd(this.state.playlist);
+        this.props.addPom(this.state.playlist);
         this.reset();
         this.props.close();
     }
@@ -172,7 +177,8 @@ Add.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-const AddWrapped = withStyles(AddStyles)(Add);
+const AddWrapped = withStyles(AddStyles)(connect(null, dispatch => bindActionCreators({addPom}, dispatch))
+(Add));
 
 
 class AddDialog extends React.Component {
@@ -182,12 +188,12 @@ class AddDialog extends React.Component {
     handleListItemClick = value => this.props.onClose(value);
 
     render() {
-        const { classes, onClose, selectedValue, onAdd, ...other } = this.props;
+        const { classes, onClose, selectedValue, ...other } = this.props;
 
         return (
             <Dialog onClose={this.handleClose} aria-labelledby="add-dialog-title" {...other}>
                 <DialogTitle id="add-dialog-title">Enter Playlist Details</DialogTitle>
-                <AddWrapped onAdd={onAdd} close={this.handleClose} />
+                <AddWrapped close={this.handleClose} />
             </Dialog>
         );
     }

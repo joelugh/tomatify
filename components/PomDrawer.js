@@ -2,10 +2,12 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { compose, bindActionCreators } from 'redux';
 import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase';
+import Router, { useRouter } from 'next/router';
 import Timestamp from 'react-timestamp';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import MuiLink from '@material-ui/core/Link';
 import Drawer from '@material-ui/core/Drawer';
 import Button from '@material-ui/core/Button';
 import IconButton  from '@material-ui/core/IconButton';
@@ -20,6 +22,11 @@ import { playPom, toggleSavedPom } from '../redux/firebase';
 import { selectPomData } from '../utils';
 import TrackList from './TrackList';
 import Tags from './Tags';
+import { setPomId } from '../redux/client';
+import Link from 'next/link';
+
+// This resolves to nothing and doesn't affect browser history
+const dudUrl = 'javascript:;';
 
 const useStyles = makeStyles({
     list: {
@@ -76,7 +83,15 @@ const useStyles = makeStyles({
     inline: {
         display: 'inline',
     },
+    name: {
+        textDecoration: 'underline',
+    }
 });
+
+function removeHash () {
+    history.replaceState("", document.title, window.location.pathname
+                                                       + window.location.search);
+}
 
 function PomDrawer({
     id,
@@ -86,6 +101,7 @@ function PomDrawer({
     user,
     toggleSaved = () => {},
     play = () => {},
+    setPomId = () => {},
     ...props
 }) {
 
@@ -93,16 +109,32 @@ function PomDrawer({
 
     const [open, setOpen] = React.useState(false);
 
-    const toggleDrawer = (open) => event => {
-        if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-        return;
+    React.useEffect(() => {
+        if(location.hash) {
+            if (location.hash !== id) {
+                setPomId(location.hash.substring(1));
+            }
         }
-        setOpen(open);
+    },[])
+
+    React.useEffect(() => {
+        if (id) {
+            setOpen(true);
+            if (location.hash != id) setTimeout(() => {location.hash = id}, 100);
+        } else {
+            setOpen(false);
+            if (location.hash != '') setTimeout(() => {removeHash()}, 100);
+        }
+    },[id]);
+
+    const toggleDrawer = (open) => event => {
+        setPomId();
     };
 
     const {
         title = '',
         userName = '',
+        userId = '',
         description = '',
         duration = 0,
         imageSrc = '',
@@ -117,11 +149,6 @@ function PomDrawer({
     const isSaved = user && user.saved && user.saved[id];
 
     return (
-        <>
-        <div onClick={toggleDrawer(true)} {...props}>
-            {children}
-        </div>
-        {/* <Button onClick={toggleDrawer(true)}>More</Button> */}
         <Drawer anchor="bottom" open={open} onClose={toggleDrawer(false)}>
             <div className={classes.drawer}>
                 <IconButton className={classes.collapseButton} onClick={toggleDrawer(false)}>
@@ -150,9 +177,13 @@ function PomDrawer({
                         <Typography component="span" variant="h6" className={classes.inline} color="textPrimary">
                             {`${duration} mins`}
                         </Typography>
-                        <Typography component="span" variant="subtitle1" className={classes.inline} color="textPrimary" style={{fontSize: '0.75em',}}>
-                            {userName}
-                        </Typography>
+                        <Link href="/user/[id]" as={`/user/${userId}`}>
+                            <Typography onClick={toggleDrawer(false)} color="textPrimary">
+                                <MuiLink href={dudUrl} color="inherit">
+                                    {userName}
+                                </MuiLink>
+                            </Typography>
+                        </Link>
                         {/* <Typography component="span" variant="subtitle1" className={classes.inline} color="textSecondary" style={{fontSize: '0.7em',}}>
                             <Timestamp relative date={date} />
                         </Typography> */}
@@ -170,7 +201,6 @@ function PomDrawer({
                 </div>
             </div>
         </Drawer>
-        </>
     );
 }
 
@@ -186,8 +216,14 @@ const ConnectedPomDrawer =  compose(
         (dispatch, ownProps) => bindActionCreators({
             toggleSaved: () => toggleSavedPom(ownProps.id),
             play: () => playPom(ownProps.id),
+            setPomId,
         }, dispatch)
     ),
 )(PomDrawer);
 
-export default ConnectedPomDrawer;
+
+function WrappedDrawer(props) {
+    return <ConnectedPomDrawer id={props.id} />
+}
+
+export default connect(state => ({ id: state.client.pomId }))(WrappedDrawer);

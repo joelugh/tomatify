@@ -64,7 +64,7 @@ class RandomCard extends React.Component {
         } = this.state;
 
         const {
-            favourites,
+            favourites = {},
             onClick: _onClick,
             onToggleSaved: _onToggleSaved,
             pomIds,

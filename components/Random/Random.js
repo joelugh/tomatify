@@ -20,6 +20,8 @@ import Tags from '../Tags';
 import PomDrawer from '../PomDrawer';
 
 import { playPom, toggleSavedPom } from '../../redux/firebase';
+import { setPomId } from '../../redux/client';
+import Link from 'next/link';
 
 const styles = theme => ({
     root: {
@@ -133,35 +135,37 @@ function RandomCard(props) {
     return (
         <div className={classes.root}>
         <Card className={classes.card}>
-            <PomDrawer id={id} className={classes.details}>
-                <CardContent className={classes.content}>
-                    <Typography variant="h6">
-                        {title}
-                    </Typography>
-                    <div style={{display:'flex', alignItems:'center'}}>
-                        <Typography color="textSecondary" style={{fontSize: '0.8rem'}}>
-                                {userName}
+            <Link href='/pom/[id]' as={`/pom/${id}`}>
+                <div onClick={() => props.setPom()} className={classes.details}>
+                    <CardContent className={classes.content}>
+                        <Typography variant="h6">
+                            {title}
                         </Typography>
-                        <Typography  color="textSecondary" style={{fontSize: '0.8rem', paddingLeft: 5}}>
-                                {` — ${duration} mins`}
-                        </Typography>
-                    </div>
-                    <Typography variant="caption" component="span" style={{fontSize: '0.7rem', paddingTop: 5, paddingBottom: 10, maxWidth: 200}}color="textSecondary">
-                        {description}
-                    </Typography>
-                    <div className={classes.buttons}>
-                        <IconButton aria-label="Refresh" className={classes.refreshButton} onClick={onRandomise}>
-                            <RefreshIcon className={classes.icon} />
-                        </IconButton>
-                        {isUser && <IconButton aria-label="Favourite" className={classes.favouriteButton} onClick={toggleSaved}>
-                            {isSaved ? <FavoriteIcon className={classes.icon} /> : <FavoriteBorderIcon className={classes.icon}/>}
-                        </IconButton>}
-                        <div className={classes.tags}>
-                            <Tags id={id}/>
+                        <div style={{display:'flex', alignItems:'center'}}>
+                            <Typography color="textSecondary" style={{fontSize: '0.8rem'}}>
+                                    {userName}
+                            </Typography>
+                            <Typography  color="textSecondary" style={{fontSize: '0.8rem', paddingLeft: 5}}>
+                                    {` — ${duration} mins`}
+                            </Typography>
                         </div>
-                    </div>
-                </CardContent>
-            </PomDrawer>
+                        <Typography variant="caption" component="span" style={{fontSize: '0.7rem', paddingTop: 5, paddingBottom: 10, maxWidth: 200}}color="textSecondary">
+                            {description}
+                        </Typography>
+                        <div className={classes.buttons}>
+                            <IconButton aria-label="Refresh" className={classes.refreshButton} onClick={onRandomise}>
+                                <RefreshIcon className={classes.icon} />
+                            </IconButton>
+                            {isUser && <IconButton aria-label="Favourite" className={classes.favouriteButton} onClick={toggleSaved}>
+                                {isSaved ? <FavoriteIcon className={classes.icon} /> : <FavoriteBorderIcon className={classes.icon}/>}
+                            </IconButton>}
+                            <div className={classes.tags}>
+                                <Tags id={id}/>
+                            </div>
+                        </div>
+                    </CardContent>
+                </div>
+            </Link>
             <CardMedia
                 className={classes.cover}
                 image={imageSrc}
@@ -196,6 +200,7 @@ const ConnectedRandomCard =  compose(
         (dispatch, ownProps) => bindActionCreators({
             toggleSaved: () => toggleSavedPom(ownProps.id),
             play: () => playPom(ownProps.id),
+            setPom: () => setPomId(ownProps.id),
         }, dispatch)
     ),
 )(RandomCard);

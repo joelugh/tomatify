@@ -102,10 +102,7 @@ class PomList extends React.Component {
                     handleExpand={() => this.handleExpand(idx)}
                     canEdit={canEdit}
                     isFavourite={isFavourite}
-                    onClick={() => onClick(id)}
                     onDelete={() => onDelete(id)}
-                    onToggleSaved={() => onToggleSaved(id)}
-                    onSync={() => onSync(id)}
                     remainingSyncs={remainingSyncs}
                     showSync={showDelete}
                     showDelete={showDelete}

@@ -16,7 +16,6 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
 import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
 import FavoriteIcon from '@material-ui/icons/Favorite';
-import SendIcon from '@material-ui/icons/Send';
 
 import { playPom, toggleSavedPom } from '../../redux/firebase';
 
@@ -26,14 +25,7 @@ import TrackList from '../TrackList';
 import Tags from '../Tags';
 import { setPomId } from '../../redux/client';
 import Link from 'next/link';
-
-import {
-    isMobile,
-    isChrome,
-    isSafari,
-    isMobileSafari,
-    isOpera,
-} from "react-device-detect";
+import ShareButton from '../ShareButton';
 
 // This resolves to nothing and doesn't affect browser history
 const dudUrl = 'javascript:;';
@@ -98,27 +90,6 @@ const useStyles = makeStyles({
     }
 });
 
-function ShareButton({id, title="", name=""}) {
-
-    const isCompatible = (isMobile && (isSafari || isChrome || isOpera)) || isMobileSafari;
-    const canShare = isCompatible && global.window && navigator.share;
-
-    const data = {
-        text: `Check out ${title} by ${name} on Tomatify`,
-        url: global.window && window.location.href,
-    };
-
-    const onClick = () => {
-        if (canShare) navigator.share(data)
-        .then(() => console.log('shared', data))
-        .catch((err) => console.log(err))
-    }
-
-    return canShare ? <IconButton aria-label="Share" onClick={onClick}>
-        <SendIcon />
-    </IconButton> : null;
-}
-
 function PomView({
     id,
     pom = {},
@@ -134,24 +105,6 @@ function PomView({
     const classes = useStyles();
 
     const [open, setOpen] = React.useState(false);
-
-    // React.useEffect(() => {
-    //     if(location.hash) {
-    //         if (location.hash !== id) {
-    //             setPomId(location.hash.substring(1));
-    //         }
-    //     }
-    // },[])
-
-    // React.useEffect(() => {
-    //     if (id) {
-    //         setOpen(true);
-    //         if (location.hash != id) setTimeout(() => {location.hash = id}, 100);
-    //     } else {
-    //         setOpen(false);
-    //         if (location.hash != '') setTimeout(() => {removeHash()}, 100);
-    //     }
-    // },[id]);
 
     const {
         title = '',
@@ -175,7 +128,7 @@ function PomView({
             <KeyboardBackspaceIcon/>
         </IconButton>
         <div className={classes.buttons}>
-            <ShareButton id={id} title={title} name={userName} />
+            <ShareButton title={title} name={userName} />
             {showSaved ? <IconButton aria-label="Favourite" onClick={toggleSaved}>
                 {isSaved ? <FavoriteIcon /> : <FavoriteBorderIcon />}
             </IconButton> : null}

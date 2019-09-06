@@ -10,9 +10,13 @@ import PomList from '../PomList';
 
 import InfiniteScroll from 'react-infinite-scroller';
 import { Emoji } from 'emoji-mart';
-import { Chip } from '@material-ui/core';
+import { Chip, IconButton } from '@material-ui/core';
 
 import Loading from '../Loading';
+import ShareButton from '../ShareButton';
+import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
+import Router from 'next/router';
+
 
 const INIT_NUM_LOAD = 5;
 const INC_NUM_LOAD = 10;
@@ -65,6 +69,22 @@ function UserView(props) {
     };
 
     return <>
+            <div style={{
+                position: 'absolute',
+                top: 75,
+                left: 10,
+            }}>
+                <IconButton onClick={() => Router.back()}>
+                    <KeyboardBackspaceIcon/>
+                </IconButton>
+            </div>
+            <div style={{
+                position: 'absolute',
+                top: 75,
+                right: 10,
+            }}>
+                <ShareButton name={name} />
+            </div>
             {headingComponent}
             {recent && <Random pomIds={pomIds} />}
             {recent &&

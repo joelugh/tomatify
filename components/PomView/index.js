@@ -16,6 +16,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
 import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
 import FavoriteIcon from '@material-ui/icons/Favorite';
+import SendIcon from '@material-ui/icons/Send';
 
 import { playPom, toggleSavedPom } from '../../redux/firebase';
 
@@ -25,6 +26,14 @@ import TrackList from '../TrackList';
 import Tags from '../Tags';
 import { setPomId } from '../../redux/client';
 import Link from 'next/link';
+
+import {
+    isMobile,
+    isChrome,
+    isSafari,
+    isMobileSafari,
+    isOpera,
+} from "react-device-detect";
 
 // This resolves to nothing and doesn't affect browser history
 const dudUrl = 'javascript:;';
@@ -76,7 +85,7 @@ const useStyles = makeStyles({
         top: 5,
         left: 5,
     },
-    favouriteButton: {
+    buttons: {
         position: 'absolute',
         top: 5,
         right: 5,
@@ -89,9 +98,25 @@ const useStyles = makeStyles({
     }
 });
 
-function removeHash () {
-    history.replaceState("", document.title, window.location.pathname
-                                                       + window.location.search);
+function ShareButton({id, title="", name=""}) {
+
+    const isCompatible = (isMobile && (isSafari || isChrome || isOpera)) || isMobileSafari;
+    const canShare = isCompatible && global.window && navigator.share;
+
+    const data = {
+        text: `Check out ${title} by ${name} on Tomatify`,
+        url: global.window && window.location.href,
+    };
+
+    const onClick = () => {
+        if (canShare) navigator.share(data)
+        .then(() => console.log('shared', data))
+        .catch((err) => console.log(err))
+    }
+
+    return canShare ? <IconButton aria-label="Share" onClick={onClick}>
+        <SendIcon />
+    </IconButton> : null;
 }
 
 function PomView({
@@ -149,9 +174,12 @@ function PomView({
         <IconButton className={classes.collapseButton} onClick={() => Router.back()}>
             <KeyboardBackspaceIcon/>
         </IconButton>
-        {showSaved ? <IconButton className={classes.favouriteButton} aria-label="Favourite" onClick={toggleSaved}>
-            {isSaved ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-        </IconButton> : null}
+        <div className={classes.buttons}>
+            <ShareButton id={id} title={title} name={userName} />
+            {showSaved ? <IconButton aria-label="Favourite" onClick={toggleSaved}>
+                {isSaved ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+            </IconButton> : null}
+        </div>
         <div className={classes.drawCard}>
             <div
                 style={{

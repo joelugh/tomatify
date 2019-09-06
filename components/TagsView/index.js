@@ -7,6 +7,8 @@ import {
     ListItem,
     Typography,
     Button,
+    Chip,
+    Badge,
 } from '@material-ui/core';
 
 import InfiniteScroll from 'react-infinite-scroller';
@@ -16,6 +18,8 @@ import Random from '../Random';
 import { Emoji } from 'emoji-mart';
 import Loading from '../Loading';
 import Link from 'next/link';
+
+import { special as specialTags } from '../Tags';
 
 const INIT_NUM_LOAD = 5;
 const INC_NUM_LOAD = 10;
@@ -28,6 +32,7 @@ function TagsView({
 
     const [loaded, setLoaded] = React.useState(true);
     const [numLoaded, setNumLoaded] = React.useState(INIT_NUM_LOAD);
+    const [toggle, setToggle] = React.useState(true);
 
     const root = {
         width: '100%',
@@ -43,9 +48,20 @@ function TagsView({
         flexDirection: 'column',
     }
 
-    const headingComponent = <Typography component="div" variant="h4" style={{marginTop: 20, marginBottom: 20}}>
-        Tomatify Tags
-    </Typography>
+    const headingComponent = <>
+        <div style={{display:'flex'}}>
+            <div onClick={() => setToggle(true)} style={{marginLeft: 10, marginRight: 10, color: toggle ? 'black' : 'lightgrey', userSelect: 'none'}}>
+                <Typography component="div" variant="h4" style={{marginTop: 20, marginBottom: 20}}>
+                    Pick
+                </Typography>
+            </div>
+            <div onClick={() => setToggle(false)} style={{marginLeft: 10, marginRight: 10, color: !toggle ? 'black' : 'lightgrey', userSelect: 'none'}}>
+                <Typography component="div" variant="h4" style={{marginTop: 20, marginBottom: 20}}>
+                    Browse
+                </Typography>
+            </div>
+        </div>
+    </>
 
     if (!loaded) {
     return <>
@@ -61,11 +77,23 @@ function TagsView({
         </>
     }
 
-    let tagsList = Object.keys(tags).sort((a,b) => Object.keys(tags[b]).length - Object.keys(tags[a]).length).slice(0, numLoaded);
+    const sortedTagsList = Object.keys(tags).sort((a,b) => Object.keys(tags[b]).length - Object.keys(tags[a]).length);
+    const tagsList = sortedTagsList.filter(tag => !!!specialTags[tag]).slice(0, numLoaded);
 
     return <>
         {headingComponent}
-        <InfiniteScroll
+        {toggle && <div style={{maxWidth: 460, minWidth: 320, display:'flex',flexWrap:'wrap', justifyContent:'center', padding: '10px 20px 50px 20px'}}>
+            {Object.keys(tags).map(tag => <div style={{margin:5}}>
+                <Link key={tag} href="/tags/[id]" as={`/tags/${tag}`}>
+                    <Chip
+                        size="medium"
+                        variant="outlined"
+                        label={<span style={{fontSize:12}}><Emoji native emoji={tag} size={14} />{Object.keys(tags[tag]).length > 1 ? ` ${Object.keys(tags[tag]).length}` : ""}</span>}
+                    />
+                </Link>
+            </div>)}
+        </div>}
+        {!toggle && <InfiniteScroll
             pageStart={0}
             loadMore={() => {
                 setNumLoaded(numLoaded => numLoaded + INC_NUM_LOAD);
@@ -78,7 +106,7 @@ function TagsView({
                 {tagsList.map(tag => {
                     return <ListItem key={tag} style={listItem}>
                         <Link href="/tags/[id]" as={`/tags/${tag}`}>
-                            <Button style={{marginLeft: 25, display: 'flex', alignItems: 'flex-end'}}>
+                            <Button style={{display: 'flex', alignItems: 'flex-end'}}>
                                 <Emoji native emoji={tag} size={16} />
                                 <Typography variant="caption" style={{paddingLeft:5}}>({Object.keys(tags[tag]).length})</Typography>
                             </Button>
@@ -87,7 +115,7 @@ function TagsView({
                     </ListItem>
                 })}
             </List>
-        </InfiniteScroll>
+        </InfiniteScroll>}
     </>;
 
 }

@@ -19,7 +19,7 @@ const styles = theme => ({
 
 });
 
-const special = {
+export const special = {
     "fire": true,
     "cd": true,
     "microphone": true,

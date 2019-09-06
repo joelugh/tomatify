@@ -32,7 +32,7 @@ class DeleteButtonWithDialog extends React.Component {
 
     return (
       <div>
-        <IconButton aria-label="Delete" onClick={this.handleClickOpen}>
+        <IconButton size="small" aria-label="Delete" onClick={this.handleClickOpen}>
             <DeleteIcon />
         </IconButton>
         <Dialog

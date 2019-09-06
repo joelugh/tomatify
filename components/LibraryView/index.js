@@ -26,15 +26,9 @@ function LibraryView(props) {
 
     const { recent = {}, popular = {}, user = {}, filter, tag } = props;
 
-    const [loaded, setLoaded] = React.useState(false);
+    const [loaded, setLoaded] = React.useState(true);
 
     const [numLoaded, setNumLoaded] = React.useState(INIT_NUM_LOAD);
-
-    React.useEffect(() => {
-        setLoaded(false);
-        setTimeout(() => setLoaded(true), LOAD_DELAY_MS);
-        setNumLoaded(INIT_NUM_LOAD);
-    }, [filter]);
 
     const uploadsToggle = <div style={{display:'flex'}}>
         <div style={{marginLeft: 10, marginRight: 10, color: 'black', userSelect: 'none'}}>
@@ -110,6 +104,7 @@ function LibraryView(props) {
                 }}
                 hasMore={numLoaded < pomIds.length}
                 loader={<div className="loader" style={{display:'flex', justifyContent: 'center', width: '100%', padding: '20px 20px 30px 20px'}} key={0}>Loading ...</div>}
+                style={{width:'100%', display:'flex', flexDirection: 'column', alignItems:'center'}}
             >
                 <PomList {...listProps}/>
             </InfiniteScroll>}

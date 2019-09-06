@@ -14,7 +14,7 @@ const styles = theme => ({
     root: {
         width: 'auto',
         maxWidth: '500px',
-        minWidth: '360px',
+        minWidth: '320px',
         backgroundColor: theme.palette.background.paper,
     },
     subheader: {

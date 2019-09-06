@@ -29,7 +29,7 @@ const styles = {
         zIndex: 1,
     },
     root: {
-        width: 360,
+        width: 320,
     },
 };
 

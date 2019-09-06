@@ -36,7 +36,7 @@ class SyncButtonWithDialog extends React.Component {
 
     return (
       <div>
-        <IconButton aria-label="Sync" onClick={this.handleClickOpen}>
+        <IconButton size="small" aria-label="Sync" onClick={this.handleClickOpen}>
             <RefreshIcon />
         </IconButton>
         <Dialog

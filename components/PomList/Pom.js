@@ -77,6 +77,7 @@ const styles = theme => ({
     cover: {
         objectFit: 'cover',
         width: 80,
+        minWidth: 80,
         height: 80,
     },
     playButton: {
@@ -162,6 +163,7 @@ function ExpandingPom({
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'flex-start',
+                        width: 'auto',
                     }}
                 >
                     <img src={imageSrc} className={classes.cover} />
@@ -171,8 +173,8 @@ function ExpandingPom({
                     <div style={{
                         display: 'flex',
                         flexDirection: 'column',
-                        paddingLeft: 15,
-                        paddingRight: 15,
+                        marginLeft: 15,
+                        marginRight: 15,
                         width: 'auto',
                     }}>
                         <Typography variant="h6" style={{fontSize: '0.9em',}}>{title}</Typography>
@@ -188,16 +190,19 @@ function ExpandingPom({
                             <Timestamp relative date={date} />
                         </Typography>
                         </div>
-                        <div>
+                        <div style={{display:'flex', flexWrap: 'wrap'}}>
                             <Tags id={id} addButton={canModifyTags} deleteButton={canModifyTags} />
                         </div>
                     </div>
                 </div>
                 <div style={{
                     display: 'flex',
+                    flexWrap: 'wrap',
+                    width: 'auto',
+                    justifyContent: 'flex-end',
                     alignItems: 'center',
                 }}>
-                    {(isUser && showSaved) ? <IconButton aria-label="Favourite" onClick={onToggleSaved}>
+                    {(isUser && showSaved) ? <IconButton size="small" aria-label="Favourite" onClick={onToggleSaved}>
                         {isFavourite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
                     </IconButton> : null}
                     {showSync ? <SyncButton onSync={onSync} title={title} remainingSyncs={remainingSyncs} /> : null}

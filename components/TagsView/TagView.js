@@ -70,6 +70,7 @@ function TagView(props) {
                 }}
                 hasMore={numLoaded < pomIds.length}
                 loader={<div className="loader" style={{display:'flex', justifyContent: 'center', width: '100%', padding: '20px 20px 30px 20px'}} key={0}>Loading ...</div>}
+                style={{width:'100%', display:'flex', flexDirection: 'column', alignItems:'center'}}
             >
                 <PomList {...listProps}/>
             </InfiniteScroll>}

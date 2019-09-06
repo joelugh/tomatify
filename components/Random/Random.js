@@ -33,7 +33,7 @@ const styles = theme => ({
     card: {
         display: 'flex',
         width: '100%',
-        minWidth: '360px',
+        minWidth: '320px',
         maxWidth: '500px',
         justifyContent: 'space-between',
         position: 'relative',

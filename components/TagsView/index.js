@@ -29,16 +29,10 @@ function TagsView({
     const [loaded, setLoaded] = React.useState(true);
     const [numLoaded, setNumLoaded] = React.useState(INIT_NUM_LOAD);
 
-    React.useEffect(() => {
-        // setLoaded(false);
-        // setTimeout(() => setLoaded(true), LOAD_DELAY_MS);
-        // setNumLoaded(INIT_NUM_LOAD);
-    }, []);
-
     const root = {
         width: '100%',
         maxWidth: '500px',
-        minWidth: '360px',
+        minWidth: '320px',
         padding: 0,
     };
 
@@ -78,7 +72,8 @@ function TagsView({
             }}
             hasMore={numLoaded < Object.keys(tags).length}
             loader={<div className="loader" style={{display:'flex', justifyContent: 'center', width: '100%', padding: '20px 20px 30px 20px'}} key={0}>Loading ...</div>}
-        >
+            style={{width:'100%', display:'flex', flexDirection: 'column', alignItems:'center'}}
+            >
             <List style={root}>
                 {tagsList.map(tag => {
                     return <ListItem key={tag} style={listItem}>

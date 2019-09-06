@@ -12,6 +12,11 @@ import InfiniteScroll from 'react-infinite-scroller';
 import { Emoji } from 'emoji-mart';
 
 import Loading from '../Loading';
+import Router from 'next/router';
+import { IconButton } from '@material-ui/core';
+import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
+import ShareButton from '../ShareButton';
+
 
 const INIT_NUM_LOAD = 5;
 const INC_NUM_LOAD = 10;
@@ -60,6 +65,22 @@ function TagView(props) {
     };
 
     return <>
+            <div style={{
+                position: 'absolute',
+                top: 75,
+                left: 10,
+            }}>
+                <IconButton onClick={() => Router.back()}>
+                    <KeyboardBackspaceIcon/>
+                </IconButton>
+            </div>
+            <div style={{
+                position: 'absolute',
+                top: 75,
+                right: 10,
+            }}>
+                <ShareButton name={id} />
+            </div>
             {headingComponent}
             {popular && <Random pomIds={pomIds} />}
             {popular &&

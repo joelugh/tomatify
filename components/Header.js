@@ -29,6 +29,7 @@ function Header(props) {
     const {
         user,
         auth,
+        initialised,
         classes,
     } = props;
 
@@ -40,13 +41,13 @@ function Header(props) {
                 <Typography variant="h6" color="inherit" className={classes.grow}>
                     Tomatify
                 </Typography>
-                {isLoaded(auth) && !isEmpty(auth) && <Button
+                {initialised && isLoaded(auth) && !isEmpty(auth) && <Button
                     id="sign-out"
                     color="inherit"
                     onClick={() => getAuth().signOut()}
                     >Sign Out</Button>
                 }
-                {isLoaded(auth) && isEmpty(auth) && <>
+                {initialised && isLoaded(auth) && isEmpty(auth) && <>
                     <Button
                         color="inherit"
                         variant="outlined"
@@ -81,11 +82,10 @@ Header.propTypes = {
 };
 
 const connectedHeader = compose(
-    firebaseConnect(props => ([
-    ])),
     connect((state) => ({
         auth: state.firebase.auth,
         user: state.firebase.profile,
+        initialised: state.client.initialised,
     }))
 )(Header);
 

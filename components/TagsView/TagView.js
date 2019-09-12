@@ -49,7 +49,7 @@ function TagView(props) {
 
     const showSaved = !!!(profile && profile.isEmpty);
 
-    let pomIds = (popular && popular.map(o => o.id)) || [];
+    let pomIds = (popular && popular.map && popular.map(o => o.id)) || [];
     if (poms) {
         // TODO: Need to pass same refs to prevent rerenders of random component
         if (pomIds) pomIds = pomIds.filter(id => poms[id]);

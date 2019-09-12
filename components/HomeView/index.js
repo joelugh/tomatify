@@ -1,26 +1,30 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import { compose } from 'redux'
-import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase'
+import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase';
 
+import Landing from '../Landing';
 import Poms from '../Poms';
 
-class Home extends React.Component {
+function Home({
+    recent = {}, popular = {}, user, filter, auth, initialised,
+}) {
+    const isUser = user != null && isLoaded(auth) && !isEmpty(auth);
+    const [isLanding, setIsLanding] = React.useState(true);
 
-    render() {
+    React.useEffect(() => {
+        if (isUser) setIsLanding(false);
+    });
 
-        let {recent = {}, popular = {}, user, filter, auth} = this.props;
+    if (isLanding) return <Landing goToHome={() => setIsLanding(false)}/>;
 
-        const isUser = user != null && isLoaded(auth) && !isEmpty(auth);
+    return <Poms
+        recent={recent}
+        popular={popular}
+        user={isUser && user}
+        filter={filter}
+    />
 
-        return <Poms
-            recent={recent}
-            popular={popular}
-            user={isUser && user}
-            filter={filter}
-        />
-
-    }
 }
 
 export default compose(
@@ -37,5 +41,6 @@ export default compose(
         tags: state.firebase.data.tags,
         tag: state.client.tag,
         filter: state.client.filter,
+        initialised: state.client.initialised,
     }))
 )(Home);

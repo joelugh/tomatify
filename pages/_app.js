@@ -1,15 +1,10 @@
 import React from 'react';
-import get from 'lodash/get';
-
 import App, { Container } from 'next/app';
-import Router from 'next/router';
 import Head from 'next/head';
-
 import { compose } from 'redux'
 import { Provider, connect } from 'react-redux';
 import { firebaseConnect } from 'react-redux-firebase';
 
-import { getFirebase } from '../db/index';
 import withReduxStore from '../utils/withReduxStore';
 
 import theme from '../utils/theme'

@@ -34,7 +34,10 @@ class RandomCard extends React.Component {
 
     componentDidUpdate(prevProps) {
         const {pomIds} = this.props;
-        if (pomIds !== prevProps.pomIds) this.update();
+        if (pomIds === prevProps.pomIds) return;
+
+        // naive check
+        if (JSON.stringify(pomIds) !== JSON.stringify(prevProps.pomIds)) this.update();
     }
 
     update = () => this.setState(() => {

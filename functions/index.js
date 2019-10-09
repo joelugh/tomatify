@@ -302,9 +302,9 @@ exports.newPomNotify = functions.database.ref('/pom/{pushId}')
                 // TODO: Should listen to these responses and remove tokens which are no longer valid
                 return admin.messaging().send(message);
             });
-            return Promise.all(promises);
+            return Promise.all(promises.map(p => p.catch(e => e)));
         });
-        Promise.all(promises)
+        Promise.all(promises.map(p => p.catch(e => e)))
         .then((responses) => {
             console.log(`Successfully sent message for ${original.title}`);
         })

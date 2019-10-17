@@ -256,22 +256,7 @@ const calcTags = () => {
 
 }
 
-
-exports.calcTags = functions.https.onRequest(calcTags);
-exports.calcRecent = functions.https.onRequest(calcRecent);
-exports.calcPopular = functions.https.onRequest(calcPopular);
-exports.scheduledCalcMostPopular = functions.pubsub.schedule('every 1 hours').onRun((context) => calcPopular(context).then(calcTags));
-
-// [START makeUppercase]
-// Listens for new messages added to /messages/:pushId/original and creates an
-// uppercase version of the message to /messages/:pushId/uppercase
-exports.newPomNotify = functions.database.ref('/pom/{pushId}')
-.onCreate((snapshot, context) => {
-
-    // Update recent and popular
-    calcRecent();
-    calcPopular();
-
+const notifyUsers = (snapshot, context) => {
     // Grab the current value of what was written to the Realtime Database.
     const original = snapshot.val();
 
@@ -313,14 +298,46 @@ exports.newPomNotify = functions.database.ref('/pom/{pushId}')
         });
 
     });
+}
 
+
+exports.updateAll = functions.https.onRequest(() => {
+    return Promise.resolve()
+    .then(() => calcRecent())
+    .then(() => calcPopular())
+    .then(() => calcTags())
+});
+
+exports.calcTags = functions.https.onRequest(calcTags);
+exports.calcRecent = functions.https.onRequest(calcRecent);
+exports.calcPopular = functions.https.onRequest(calcPopular);
+exports.scheduledCalcMostPopular = functions.pubsub.schedule('every 1 hours')
+.onRun((context) => {
+    return Promise.resolve()
+    .then(() => calcRecent())
+    .then(() => calcPopular())
+    .then(() => calcTags());
+});
+
+// [START makeUppercase]
+// Listens for new messages added to /messages/:pushId/original and creates an
+// uppercase version of the message to /messages/:pushId/uppercase
+exports.newPomNotify = functions.database.ref('/pom/{pushId}')
+.onCreate((snapshot, context) => {
+    // Update recent and popular
+    return Promise.resolve()
+    .then(() => calcRecent())
+    .then(() => calcPopular())
+    .then(() => calcTags())
+    .then(() => notifyUsers(snapshot, context));
 })
 
 exports.deletePom = functions.database.ref('/pom/{pushId}')
 .onDelete((snapshot, context) => {
     // Update recent and popular
-    calcRecent();
-    calcPopular();
+    return Promise.resolve()
+    .then(() => calcRecent())
+    .then(() => calcPopular())
 })
 // [END makeUppercase]
 // [END all]

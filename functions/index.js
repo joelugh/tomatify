@@ -114,7 +114,8 @@ const calcPopular = (context) => {
             const user = db.users[userId];
             if (!user.saved) return;
             Object.keys(user.saved).forEach(pomId => {
-                if (db.pom && db.pom[pomId].userId == userId) return;
+                if (!db || !db.pom || !db.pom[pomId]) return;
+                if (db.pom[pomId].userId == userId) return;
                 pomScores[pomId] = pomScores[pomId] ? pomScores[pomId] + SAVED_MULTIPLIER : SAVED_MULTIPLIER;
             })
 
@@ -123,8 +124,8 @@ const calcPopular = (context) => {
         const topAll = top.filter(o => db.pom && db.pom[o.id]);
         const oneMonthMillis = 1000*60*60*24*30;
         const oneWeekMillis = 1000*60*60*24*7;
-        const topMonth = top.filter(o => db.pom && Date.now() - db.pom[o.id].createTime < oneMonthMillis);
-        const topWeek = top.filter(o => db.pom && Date.now() - db.pom[o.id].createTime < oneWeekMillis);
+        const topMonth = top.filter(o => db.pom && db.pom[o.id] && Date.now() - db.pom[o.id].createTime < oneMonthMillis);
+        const topWeek = top.filter(o => db.pom && db.pom[o.id] && Date.now() - db.pom[o.id].createTime < oneWeekMillis);
         return Promise.all([
             admin.database().ref("popular/all").set(topAll),
             admin.database().ref("popular/month").set(topMonth),

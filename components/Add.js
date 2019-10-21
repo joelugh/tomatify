@@ -130,7 +130,7 @@ class Add extends React.Component {
         let imageSrc;
         if (playlist) {
             const { tracks, images } = playlist;
-            duration = Math.round(tracks.items.map(t => t.track.duration_ms).reduce((a,b) => a + b, 0)/1000/60);
+            duration = Math.floor(tracks.items.map(t => t.track.duration_ms).reduce((a,b) => a + b, 0)/1000/60);
             durationOkay = (duration >= 20) && (duration <= 30);
             imageSrc = images && ((images.length > 1 && images[1].url) || (images.length > 0 && images[0].url) || null)
         }

@@ -106,6 +106,10 @@ const calcPopular = (context) => {
     .then(snapshot => {
         const pomScores = {};
         const db = snapshot.val();
+        if (db.pom) Object.keys(db.pom).forEach(pomId => {
+            // initialise all to 0
+            pomScores[pomId] = 0;
+        });
         if (db.clicks) Object.keys(db.clicks).forEach(pomId => {
             const clicks = parseInt(db.clicks[pomId],10);
             pomScores[pomId] = pomScores[pomId] ? pomScores[pomId] + clicks : clicks;

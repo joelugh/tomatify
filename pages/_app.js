@@ -3,13 +3,15 @@ import App from 'next/app';
 import Head from 'next/head';
 import { compose } from 'redux'
 import { Provider, connect } from 'react-redux';
-import { firebaseConnect } from 'react-redux-firebase';
+import { firebaseConnect, ReactReduxFirebaseProvider } from 'react-redux-firebase';
 
 import withReduxStore from '../utils/withReduxStore';
 
 import theme from '../utils/theme'
 import { ThemeProvider } from '@material-ui/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
+
+import { getFirebase as getFirebaseApp } from '../db';
 
 
 class _App extends App {
@@ -53,7 +55,15 @@ class _App extends App {
             connect((state, props) => ({})),
             firebaseConnect((props) => []),
           // exclude firebase from pageProps
-          )(({firebase:_, ...props}) => <Component {...props} />)
+          )(({firebase, ...props}) => <Component {...props} />)
+
+        const rrfConfig = {
+            userProfile: 'users', // firebase root where user profiles are stored
+            attachAuthIsReady: true, // attaches auth is ready promise to store
+            firebaseStateName: 'firebase' // should match the reducer name ('firebase' is default)
+        }
+
+        const firebaseApp = getFirebaseApp()
 
         return (
             <>
@@ -63,7 +73,13 @@ class _App extends App {
                 <ThemeProvider theme={theme}>
                     <CssBaseline />
                     <Provider store={reduxStore} >
-                        <FirebaseComponent {...pageProps} />
+                        <ReactReduxFirebaseProvider
+                            firebase={firebaseApp}
+                            config={rrfConfig}
+                            dispatch={reduxStore.dispatch}
+                        >
+                            <FirebaseComponent {...pageProps} />
+                        </ReactReduxFirebaseProvider>
                     </Provider>
                 </ThemeProvider>
             </>

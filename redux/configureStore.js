@@ -7,8 +7,7 @@ import batchedSubscribeMiddleware from './batching/middleware'
 import batchedSubscribeEnhancer from './batching/enhancer'
 
 // react-redux-firebase
-import { reactReduxFirebase, firebaseReducer, getFirebase} from 'react-redux-firebase'
-import { getFirebase as getFirebaseApp } from '../db';
+import { firebaseReducer, getFirebase} from 'react-redux-firebase'
 
 import clientReducer from './client';
 
@@ -32,28 +31,10 @@ export function configureStore(state = initialState) {
 		applyMiddleware(thunk.withExtraArgument(getFirebase))
 	];
 
-	const firebaseApp = getFirebaseApp()
-
-	// react-redux-firebase options
-	const rrfConfig = {
-		userProfile: 'users', // firebase root where user profiles are stored
-		attachAuthIsReady: true, // attaches auth is ready promise to store
-		firebaseStateName: 'firebase' // should match the reducer name ('firebase' is default)
-	}
-	middlewares.push(reactReduxFirebase(firebaseApp, rrfConfig))
-
-	// batching for firebase-redux actions
-	middlewares.push(...[
-		batchedSubscribeEnhancer,
-        applyMiddleware(batchedSubscribeMiddleware),
-	])
-
 	const enhancer = composeEnhancers(...middlewares)
 
 	const store = createStore(rootReducer, state, enhancer);
-	store.firebaseAuthIsReady.then(() => {
-		// console.log('Auth has loaded') // eslint-disable-line no-console
-	})
+
 	return store;
 
 }

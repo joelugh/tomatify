@@ -1,5 +1,5 @@
 import React from 'react';
-import App, { Container } from 'next/app';
+import App from 'next/app';
 import Head from 'next/head';
 import { compose } from 'redux'
 import { Provider, connect } from 'react-redux';
@@ -56,7 +56,7 @@ class _App extends App {
           )(({firebase:_, ...props}) => <Component {...props} />)
 
         return (
-            <Container>
+            <>
                 <Head>
                     <title>Tomatify</title>
                 </Head>
@@ -66,7 +66,7 @@ class _App extends App {
                         <FirebaseComponent {...pageProps} />
                     </Provider>
                 </ThemeProvider>
-            </Container>
+            </>
         )
     }
 }

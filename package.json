@@ -10,7 +10,7 @@
     "url": "https://github.com/joelugh/tomatify"
   },
   "engines": {
-    "node": ">=8"
+    "node": ">=10"
   },
   "scripts": {
     "deploy": "gcloud app deploy",
@@ -20,9 +20,9 @@
     "start": "next start -p $PORT"
   },
   "dependencies": {
-    "@material-ui/core": "latest",
-    "@material-ui/icons": "latest",
-    "@material-ui/lab": "latest",
+    "@material-ui/core": "^4.9.5",
+    "@material-ui/icons": "^4.9.1",
+    "@material-ui/lab": "^4.0.0-alpha.45",
     "@zeit/next-css": "^1.0.1",
     "axios": "^0.19.0",
     "emoji-mart": "^2.11.1",

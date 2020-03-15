@@ -115,6 +115,8 @@ function ExpandingPom({
     ...props
 }) {
 
+    if (!isLoaded(pom)) return null;
+
     const {
         title = '',
         userName = '',

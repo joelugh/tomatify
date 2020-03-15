@@ -26,13 +26,13 @@ const AddStyles = theme => ({
         flexDirection: 'column',
         flexWrap: 'wrap',
         alignItems: 'center',
-        padding: theme.spacing.unit,
+        padding: theme.spacing(1),
         maxWidth: 400,
         paddingBottom: 20,
     },
     textField: {
-        marginLeft: theme.spacing.unit,
-        marginRight: theme.spacing.unit,
+        marginLeft: theme.spacing(1),
+        marginRight: theme.spacing(1),
     },
     dense: {
         marginTop: 16,

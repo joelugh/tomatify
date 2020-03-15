@@ -83,8 +83,8 @@ function TagsView({
     return <>
         {headingComponent}
         {toggle && <div style={{maxWidth: 460, minWidth: 320, display:'flex',flexWrap:'wrap', justifyContent:'center', padding: '10px 20px 50px 20px'}}>
-            {Object.keys(tags).map(tag => <div style={{margin:5}}>
-                <Link key={tag} href="/tags/[id]" as={`/tags/${tag}`}>
+            {Object.keys(tags).map(tag => <div key={tag} style={{margin:5}}>
+                <Link href="/tags/[id]" as={`/tags/${tag}`}>
                     <Chip
                         size="medium"
                         variant="outlined"

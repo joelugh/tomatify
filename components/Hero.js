@@ -9,8 +9,8 @@ import { Divider } from '@material-ui/core';
 const styles = theme => ({
     main: {
         maxWidth: 500,
-        margin: theme.spacing.unit * 2,
-        padding: theme.spacing.unit * 2,
+        margin: theme.spacing(2),
+        padding: theme.spacing(2),
         borderColor: 'rgba(0,0,0,.05)',
         borderStyle: 'solid',
         borderWeight: '1px',

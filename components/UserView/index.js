@@ -48,7 +48,7 @@ function UserView(props) {
 
     const subheaderText = `${name}'s`;
 
-    const chip = tag ? <Chip size="medium" label={<Emoji emoji={tag} native size={12}/>} onDelete={() => props.setTag(null)}/> : null;
+    const chip = tag ? <Chip size="medium" label={<Emoji emoji={tag} native size={12}/>} onDelete={() => {}}/> : null;
 
     const showSaved = !!!(profile && profile.isEmpty);
 

@@ -1,8 +1,6 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { compose, bindActionCreators } from 'redux';
-import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase';
-import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
+import { useFirebaseConnect } from 'react-redux-firebase';
 
 import Typography from '@material-ui/core/Typography';
 
@@ -12,7 +10,6 @@ import PomList from '../PomList';
 import InfiniteScroll from 'react-infinite-scroller';
 import { Emoji } from 'emoji-mart';
 import { Chip } from '@material-ui/core';
-import { setTag, setFilter } from '../../redux/client';
 
 import Loading from '../Loading';
 import Link from 'next/link';
@@ -20,11 +17,15 @@ import AddButton from '../Add';
 
 const INIT_NUM_LOAD = 5;
 const INC_NUM_LOAD = 10;
-const LOAD_DELAY_MS = 1000;
 
 function LibraryView(props) {
 
-    const { recent = {}, popular = {}, user = {}, filter, tag } = props;
+    useFirebaseConnect([
+        'recent',
+    ])
+
+    const recent = useSelector(state => state.firebase.data.recent);
+    const user = useSelector(state => state.firebase.profile);
 
     const [loaded, setLoaded] = React.useState(true);
 
@@ -75,8 +76,6 @@ function LibraryView(props) {
 
     const subheaderText = "Your";
 
-    const chip = tag ? <Chip size="medium" label={<Emoji emoji={tag} native size={12}/>} onDelete={() => props.setTag(null)}/> : null;
-
     const showSaved = false;
 
     const listProps = {
@@ -88,7 +87,6 @@ function LibraryView(props) {
         showDelete: !!(user && !user.isEmpty),
         showSaved,
         subheaderText,
-        chip,
     };
 
     return (
@@ -112,20 +110,4 @@ function LibraryView(props) {
     );
 }
 
-export default compose(
-    firebaseConnect(props => ([
-        'recent',
-        'tags',
-    ])),
-    connect((state, _props) => ({
-        recent: state.firebase.data.recent,
-        auth: state.firebase.auth,
-        user: state.firebase.profile,
-        tags: state.firebase.data.tags,
-        tag: state.client.tag,
-        filter: state.client.filter,
-        id: state.client.pomId,
-    }),
-    dispatch => bindActionCreators({setFilter}, dispatch)
-    )
-)(LibraryView);
+export default LibraryView;

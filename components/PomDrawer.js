@@ -2,8 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { compose, bindActionCreators } from 'redux';
 import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase';
-import Router, { useRouter } from 'next/router';
-import Timestamp from 'react-timestamp';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
@@ -18,11 +16,9 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 
 import { playPom, toggleSavedPom } from '../redux/firebase';
 
-
 import { selectPomData } from '../utils';
 import TrackList from './TrackList';
 import Tags from './Tags';
-import { setPomId } from '../redux/client';
 import Link from 'next/link';
 
 // This resolves to nothing and doesn't affect browser history
@@ -88,11 +84,6 @@ const useStyles = makeStyles({
     }
 });
 
-function removeHash () {
-    history.replaceState("", document.title, window.location.pathname
-                                                       + window.location.search);
-}
-
 function PomDrawer({
     id,
     pom = {},
@@ -101,35 +92,12 @@ function PomDrawer({
     user,
     toggleSaved = () => {},
     play = () => {},
-    setPomId = () => {},
     ...props
 }) {
 
     const classes = useStyles();
 
     const [open, setOpen] = React.useState(false);
-
-    React.useEffect(() => {
-        if(location.hash) {
-            if (location.hash !== id) {
-                setPomId(location.hash.substring(1));
-            }
-        }
-    },[])
-
-    React.useEffect(() => {
-        if (id) {
-            setOpen(true);
-            if (location.hash != id) setTimeout(() => {location.hash = id}, 100);
-        } else {
-            setOpen(false);
-            if (location.hash != '') setTimeout(() => {removeHash()}, 100);
-        }
-    },[id]);
-
-    const toggleDrawer = (open) => event => {
-        setPomId();
-    };
 
     const {
         title = '',
@@ -216,7 +184,6 @@ const ConnectedPomDrawer =  compose(
         (dispatch, ownProps) => bindActionCreators({
             toggleSaved: () => toggleSavedPom(ownProps.id),
             play: () => playPom(ownProps.id),
-            setPomId,
         }, dispatch)
     ),
 )(PomDrawer);

@@ -1,29 +1,23 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { compose, bindActionCreators } from 'redux';
-import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase';
-import Router, { useRouter } from 'next/router';
-import Timestamp from 'react-timestamp';
+import { useSelector, useDispatch } from 'react-redux';
+import { useFirebaseConnect } from 'react-redux-firebase';
+import Router from 'next/router';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import MuiLink from '@material-ui/core/Link';
-import Drawer from '@material-ui/core/Drawer';
 import Button from '@material-ui/core/Button';
 import IconButton  from '@material-ui/core/IconButton';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
 import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 
 import { playPom, toggleSavedPom } from '../../redux/firebase';
 
-
 import { selectPomData } from '../../utils';
 import TrackList from '../TrackList';
 import Tags from '../Tags';
-import { setPomId } from '../../redux/client';
 import Link from 'next/link';
 import ShareButton from '../ShareButton';
 
@@ -98,11 +92,21 @@ function PomView({
     user,
     toggleSaved = () => {},
     play = () => {},
-    setPomId = () => {},
     ...props
 }) {
 
+    useFirebaseConnect([
+        `pom/${id}`,
+    ]);
+
     const classes = useStyles();
+    const dispatch = useDispatch();
+
+    const pom = useSelector(state => id && state.firebase.data.pom && state.firebase.data.pom[id]);
+    const user = useSelector(state => state.firebase.profile);
+
+    const toggleSaved = () => dispatch(toggleSavedPom(id));
+    const play = () => dispatch(playPom(id));
 
     const [open, setOpen] = React.useState(false);
 
@@ -178,21 +182,4 @@ function PomView({
     </div>;
 }
 
-const connectedPomView = compose(
-    firebaseConnect(props => ([
-        `pom/${props.id}`,
-    ])),
-    connect(
-        (state, _props) => ({
-            pom: _props.id && state.firebase.data.pom && state.firebase.data.pom[_props.id],
-            user: state.firebase.profile,
-        }),
-        (dispatch, ownProps) => bindActionCreators({
-            toggleSaved: () => toggleSavedPom(ownProps.id),
-            play: () => playPom(ownProps.id),
-            setPomId,
-        }, dispatch)
-    ),
-)(PomView);
-
-export default connectedPomView;
+export default PomView;

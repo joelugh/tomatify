@@ -1,11 +1,9 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { compose, bindActionCreators } from 'redux';
-import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase';
-import PropTypes from 'prop-types';
+import { useSelector, useDispatch } from 'react-redux';
+import { useFirebaseConnect } from 'react-redux-firebase';
 import Timestamp from 'react-timestamp';
 
-import { withStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import ListItem from '@material-ui/core/ListItem';
 import Button from '@material-ui/core/Button';
@@ -25,12 +23,17 @@ import SyncButton from '../SyncButton';
 import { selectPomData } from '../../utils';
 
 import Tags from '../Tags';
-import { setPomId } from '../../redux/client';
-import { syncPom, toggleSavedPom, playPom, deletePom } from '../../redux/firebase';
-import Router, { useRouter } from 'next/router';
+
+import {
+    syncPom as syncPomAction,
+    toggleSavedPom as toggleSavedPomAction,
+    playPom as playPomAction,
+    deletePom as deletePomAction
+} from '../../redux/firebase';
+
 import Link from 'next/link';
 
-const styles = theme => ({
+const useStyles = makeStyles(theme => ({
     root: {
         width: '100%',
     },
@@ -90,23 +93,14 @@ const styles = theme => ({
         paddingTop: 15,
         paddingBottom: 15,
     },
-});
+}));
 
 function ExpandingPom({
-    classes,
     id,
-    user,
-    pom = {},
     canEdit,
     isFavourite,
     divider = false,
     expanded = false,
-    filter,
-    playPom = () => {},
-    deletePom = () => {},
-    toggleSavedPom = () => {},
-    syncPom = () => {},
-    setPom = () => {},
     remainingSyncs = 0,
     showSaved = false,
     showSync = false,
@@ -115,7 +109,23 @@ function ExpandingPom({
     ...props
 }) {
 
-    if (!isLoaded(pom)) return null;
+    useFirebaseConnect([
+        `pom/${id}`,
+    ])
+
+    const pom = useSelector(state => id && state.firebase.data.pom && state.firebase.data.pom[id]);
+    const user = useSelector(state => state.firebase.profile);
+    const filter = useSelector(state => state.client.filter);
+
+    const dispatch = useDispatch();
+    const classes = useStyles();
+
+    const playPom = () => dispatch(playPomAction(id));
+    const deletePom = () => dispatch(deletePomAction(id));
+    const toggleSavedPom = () => dispatch(toggleSavedPomAction(id));
+    const syncPom = () => dispatch(syncPomAction(id));
+
+    // if (!isLoaded(pom)) return null; /* Causes infinite scroll to load more */
 
     const {
         title = '',
@@ -226,28 +236,4 @@ function ExpandingPom({
     </Link>;
 }
 
-ExpandingPom.propTypes = {
-    classes: PropTypes.object.isRequired,
-};
-
-const ConnectedExpandingPom =  compose(
-    firebaseConnect(props => ([
-        `pom/${props.id}`,
-    ])),
-    connect(
-        (state, _props) => ({
-            pom: _props.id && state.firebase.data.pom && state.firebase.data.pom[_props.id],
-            user: state.firebase.profile,
-            filter: state.client.filter,
-        }),
-        (dispatch, ownProps) => bindActionCreators({
-            playPom: () => playPom(ownProps.id),
-            deletePom: () => deletePom(ownProps.id),
-            syncPom: () => syncPom(ownProps.id),
-            toggleSavedPom: () => toggleSavedPom(ownProps.id),
-            setPom: () => setPomId(ownProps.id),
-        }, dispatch)
-    ),
-)(ExpandingPom);
-
-export default withStyles(styles)(ConnectedExpandingPom);
+export default ExpandingPom;

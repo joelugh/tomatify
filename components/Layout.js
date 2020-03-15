@@ -1,7 +1,6 @@
 import React from 'react';
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
-import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase';
+import {useSelector, useDispatch} from 'react-redux';
+import {isLoaded} from 'react-redux-firebase';
 
 import {getAuth} from '../db';
 import {setInitialised} from '../redux/client';
@@ -13,15 +12,18 @@ import Loading from './Loading';
 function Layout({
     hideHeader = false,
     hideNav = false,
-    initialised,
-    auth,
-    setInitialised = () => {},
     children,
 }) {
+
+    const initialised = useSelector(state => state.client.initialised);
+    const auth = useSelector(state => state.firebase.auth);
+
+    const dispatch = useDispatch();
+
     React.useEffect(() => {
         if (initialised) return;
         const unsubscribe = getAuth().onAuthStateChanged(() => {
-            setInitialised();
+            dispatch(setInitialised(true));
             unsubscribe();
         })
     },[initialised]);
@@ -44,10 +46,4 @@ function Layout({
     </>;
 }
 
-export default connect(
-    (state) => ({
-        initialised: state.client.initialised,
-        auth: state.firebase.auth,
-    }),
-    (dispatch) => bindActionCreators({setInitialised: () => setInitialised(true)}, dispatch)
-)(Layout);
+export default Layout;

@@ -1,5 +1,4 @@
 import React from 'react';
-import {connect} from 'react-redux';
 
 import Typography from '@material-ui/core/Typography';
 
@@ -8,17 +7,11 @@ import Random from './Random';
 import PomList from './PomList';
 
 import InfiniteScroll from 'react-infinite-scroller';
-import { Emoji } from 'emoji-mart';
-import { Chip, Button } from '@material-ui/core';
-import { bindActionCreators } from 'redux';
-import { setTag } from '../redux/client';
 
 import Loading from './Loading';
-import Link from 'next/link';
 
 const INIT_NUM_LOAD = 5;
 const INC_NUM_LOAD = 10;
-const LOAD_DELAY_MS = 1000;
 
 function Poms(props) {
 
@@ -27,7 +20,6 @@ function Poms(props) {
         popular = {},
         user = {},
         filter,
-        tag
     } = props;
 
     const [loaded, setLoaded] = React.useState(true);
@@ -50,8 +42,6 @@ function Poms(props) {
 
     const subheaderText = "Latest";
 
-    const chip = tag ? <Chip size="medium" label={<Emoji emoji={tag} native size={12}/>} onDelete={() => props.setTag(null)}/> : null;
-
     const showSaved = !!!(user && user.isEmpty);
 
     const listProps = {
@@ -61,7 +51,6 @@ function Poms(props) {
         total: pomIds.length,
         showSaved,
         subheaderText,
-        chip,
     };
 
     return (
@@ -85,4 +74,4 @@ function Poms(props) {
     );
 }
 
-export default connect(state => ({ tag: state.client.tag }), dispatch => bindActionCreators({ setTag }, dispatch))(Poms);
+export default Poms;

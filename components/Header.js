@@ -1,5 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { compose } from 'redux'
 import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase'
 import PropTypes from 'prop-types';
@@ -24,14 +24,13 @@ const styles = {
     },
 };
 
-function Header(props) {
+function Header({
+    classes,
+}) {
 
-    const {
-        user,
-        auth,
-        initialised,
-        classes,
-    } = props;
+    const auth = useSelector(state => state.firebase.auth);
+    const user = useSelector(state => state.firebase.profile);
+    const initialised = useSelector(state => state.client.initialised);
 
     return (
         <div className={classes.root}>
@@ -81,12 +80,4 @@ Header.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-const connectedHeader = compose(
-    connect((state) => ({
-        auth: state.firebase.auth,
-        user: state.firebase.profile,
-        initialised: state.client.initialised,
-    }))
-)(Header);
-
-export default withStyles(styles)(connectedHeader);
+export default withStyles(styles)(Header);

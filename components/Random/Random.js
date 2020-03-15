@@ -20,7 +20,6 @@ import Tags from '../Tags';
 import PomDrawer from '../PomDrawer';
 
 import { playPom, toggleSavedPom } from '../../redux/firebase';
-import { setPomId } from '../../redux/client';
 import Link from 'next/link';
 
 const styles = theme => ({
@@ -136,7 +135,7 @@ function RandomCard(props) {
         <div className={classes.root}>
         <Card className={classes.card}>
             <Link href='/pom/[id]' as={`/pom/${id}`}>
-                <div onClick={() => props.setPom()} className={classes.details}>
+                <div className={classes.details}>
                     <CardContent className={classes.content}>
                         <Typography variant="h6">
                             {title}
@@ -200,7 +199,6 @@ const ConnectedRandomCard =  compose(
         (dispatch, ownProps) => bindActionCreators({
             toggleSaved: () => toggleSavedPom(ownProps.id),
             play: () => playPom(ownProps.id),
-            setPom: () => setPomId(ownProps.id),
         }, dispatch)
     ),
 )(RandomCard);

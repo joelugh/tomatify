@@ -48,6 +48,7 @@ function WrappedPicker({
         }}
         title={"Pom Tags"}
         emoji={"tomato"}
+        native={true}
         notFoundEmoji={"tomato"}
         showSkinTones={false}
     />;

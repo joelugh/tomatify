@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { useFirebaseConnect } from 'react-redux-firebase';
+import { useFirebaseConnect, isLoaded } from 'react-redux-firebase';
 import {Picker} from 'emoji-mart';
 import {special} from './index';
 import {getDB} from '../../db';
@@ -14,7 +14,9 @@ function WrappedPicker({
         'tags',
     ])
 
-    const tags = useSelector(state => state.firebase.data.tags)
+    const tags = useSelector(state => state.firebase.data.tags);
+
+    if (!isLoaded(tags)) return null;
 
     const reserved = {
         "Fire": true,
@@ -48,7 +50,7 @@ function WrappedPicker({
         emoji={"tomato"}
         notFoundEmoji={"tomato"}
         showSkinTones={false}
-    />
+    />;
 }
 
 export default WrappedPicker;

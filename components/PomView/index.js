@@ -86,13 +86,6 @@ const useStyles = makeStyles({
 
 function PomView({
     id,
-    pom = {},
-    dispatch: _1,
-    children,
-    user,
-    toggleSaved = () => {},
-    play = () => {},
-    ...props
 }) {
 
     useFirebaseConnect([
@@ -107,8 +100,6 @@ function PomView({
 
     const toggleSaved = () => dispatch(toggleSavedPom(id));
     const play = () => dispatch(playPom(id));
-
-    const [open, setOpen] = React.useState(false);
 
     const {
         title = '',

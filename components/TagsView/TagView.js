@@ -5,7 +5,6 @@ import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase';
 
 import Typography from '@material-ui/core/Typography';
 
-import Random from '../Random';
 import PomList from '../PomList';
 
 import InfiniteScroll from 'react-infinite-scroller';
@@ -51,7 +50,6 @@ function TagView(props) {
 
     let pomIds = (popular && popular.map && popular.map(o => o.id)) || [];
     if (poms) {
-        // TODO: Need to pass same refs to prevent rerenders of random component
         if (pomIds) pomIds = pomIds.filter(id => poms[id]);
     }
 
@@ -82,7 +80,6 @@ function TagView(props) {
                 <ShareButton name={id} />
             </div>
             {headingComponent}
-            {popular && <Random pomIds={pomIds} />}
             {popular &&
             <InfiniteScroll
                 pageStart={0}

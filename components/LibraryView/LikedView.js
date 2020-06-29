@@ -4,7 +4,6 @@ import { useFirebaseConnect } from 'react-redux-firebase';
 
 import Typography from '@material-ui/core/Typography';
 
-import Random from '../Random';
 import PomList from '../PomList';
 
 import InfiniteScroll from 'react-infinite-scroller';
@@ -67,7 +66,6 @@ function LikedView(props) {
 
     let pomIds = (recent && recent["all"]) || [];
     if (user) {
-        // TODO: Need to pass same refs to prevent rerenders of random component
         if (pomIds) pomIds = pomIds.filter(id => user.saved && user.saved[id]);
     }
 
@@ -87,7 +85,6 @@ function LikedView(props) {
     return (
         <>
             {headingComponent}
-            {recent && <Random pomIds={pomIds} />}
             {recent &&
             <InfiniteScroll
                 pageStart={0}

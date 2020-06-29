@@ -6,8 +6,7 @@ import {special} from './index';
 import {getDB} from '../../db';
 
 function WrappedPicker({
-    id,
-    setOpen = () => {},
+    onSelect = () => {},
 }) {
 
     useFirebaseConnect([
@@ -36,12 +35,7 @@ function WrappedPicker({
         .sort((a,b) => Object.keys(tags[b]).length - Object.keys(tags[a]).length);
 
     return <Picker
-        onSelect={tag => {
-            setOpen(false)
-            const db = getDB();
-            db.ref(`tags/${tag.id}/${id}`).set(true);
-            db.ref(`tagsById/${id}/${tag.id}`).set(true);
-        }}
+        onSelect={onSelect}
         recent={recent}
         emojisToShowFilter={emoji => {
             return !!!reserved[emoji.name];

@@ -5,16 +5,16 @@ import { withStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import Button from '@material-ui/core/Button';
-import UnfoldMoreIcon from '@material-ui/icons/UnfoldMore';
-import UnfoldLessIcon from '@material-ui/icons/UnfoldLess';
+import Divider  from '@material-ui/core/Divider';
+
 
 import Pom from './Pom';
 
 const styles = theme => ({
     root: {
-        width: 'auto',
-        maxWidth: '500px',
-        minWidth: '320px',
+        width: '100%',
+        maxWidth: 500,
+        minWidth: 320,
         backgroundColor: theme.palette.background.paper,
     },
     subheader: {
@@ -28,78 +28,35 @@ const styles = theme => ({
     }
 });
 
-class PomList extends React.Component {
-
-    state = {
-        expanded: null,
-        all: false,
-    }
-
-    componentDidUpdate(prevProps) {
-        if (this.props.pomIds !== prevProps.pomIds) this.setState({expanded:null});
-    }
-
-    handleExpand = idx => this.setState(state => ({
-        all: false,
-        expanded: state.all ? null : state.expanded === idx ? null : idx,
-    }));
-
-    handleToggle = () => this.setState(state => ({
-        all: !(state.all || state.expanded !== null),
-        expanded: null,
-    }));
-
-    render() {
-
-        const {
-            expanded,
-            all,
-        } = this.state;
-
-        const {
-            classes,
-            pomIds,
-            total,
-            canEdit,
-            showDelete,
-            showSaved,
-            subheaderText,
-            chip,
-            favourites,
-            remainingSyncs,
-            onClick,
-            onDelete,
-            onToggleSaved,
-            onToggleType: _onToggleType,
-            onSync,
-        } = this.props;
-
-        const unfoldLess = all || expanded !== null;
-
-        const onToggleType = _onToggleType ? _onToggleType : () => {};
-
-        return <List
-            className={classes.root}
-            subheader={
-                <ListSubheader className={classes.subheader}>
-                    {_onToggleType && <div style={{display: 'flex', alignItems:'center'}}><Button style={{padding: 1, marginRight: 5, minWidth:'0px'}} onClick={onToggleType}>{subheaderText}</Button> Poms ({total})</div>}
-                    {!_onToggleType && <div style={{display: 'flex', alignItems:'center'}}>{subheaderText}<> Poms ({total})</></div>}
-                    <div>
-                        {chip}
-                        <Button className={classes.toggle} onClick={this.handleToggle}>
-                            {unfoldLess ? <UnfoldLessIcon /> : <UnfoldMoreIcon />}
-                        </Button>
-                    </div>
-                </ListSubheader>
-            }
-        >
-            {pomIds.map((id, idx) => {
-                const isFavourite = favourites[id];
-                return <Pom
-                    key={id}
+function PomList({
+    classes,
+    pomIds,
+    total,
+    canEdit,
+    showDelete,
+    showSaved,
+    subheaderText,
+    favourites={},
+    remainingSyncs,
+    onDelete,
+    onToggleType: _onToggleType,
+    onSync,
+}) {
+    const onToggleType = _onToggleType ? _onToggleType : () => {};
+    return <List
+        className={classes.root}
+        subheader={
+            <ListSubheader className={classes.subheader}>
+                {_onToggleType && <div style={{display: 'flex', alignItems:'center'}}><Button style={{padding: 1, marginRight: 5, minWidth:'0px'}} onClick={onToggleType}>{subheaderText}</Button> Poms ({total})</div>}
+                {!_onToggleType && <div style={{display: 'flex', alignItems:'center'}}>{subheaderText}<> Poms ({total})</></div>}
+            </ListSubheader>
+        }
+    >
+        {pomIds.map((id, idx) => {
+            const isFavourite = favourites[id];
+            return <React.Fragment key={id}>
+                <Pom
                     id={id}
-                    expanded={all || expanded === idx}
-                    handleExpand={() => this.handleExpand(idx)}
                     canEdit={canEdit}
                     isFavourite={isFavourite}
                     onDelete={() => onDelete(id)}
@@ -107,11 +64,11 @@ class PomList extends React.Component {
                     showSync={showDelete}
                     showDelete={showDelete}
                     showSaved={showSaved}
-                    divider={idx !== pomIds.length-1}
                 />
-            })}
-        </List>
-    }
+                {idx !== pomIds.length-1 && <Divider/>}
+            </React.Fragment>
+        })}
+    </List>
 }
 
 PomList.propTypes = {

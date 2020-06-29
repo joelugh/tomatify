@@ -6,7 +6,7 @@ import _ from 'lodash'
 const isServer = typeof window === 'undefined'
 const __NEXT_REDUX_STORE__ = '__NEXT_REDUX_STORE__'
 
-function getOrCreateStore(state) {
+export function getOrCreateStore(state) {
   // Always make a new store if server, otherwise state is shared between requests
 
   if (isServer) {

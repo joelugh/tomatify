@@ -1,6 +1,6 @@
 import React from 'react';
 import Button from '@material-ui/core/Button';
-import AddDialog from './AddDialog';
+import Link from 'next/link';
 
 function AddButton({
     userName = '',
@@ -14,19 +14,15 @@ function AddButton({
 
     return (
         <div>
+            <Link href="/create" as={`/create`}>
             <Button
                 variant="contained"
                 color="primary"
-                onClick={handleClickOpen}
                 style={{margin: 15}}
             >
                 Add Pomodoro Playlist
             </Button>
-            <AddDialog
-                open={open}
-                onClose={handleClose}
-                {...otherProps}
-            />
+            </Link>
         </div>
     );
 }

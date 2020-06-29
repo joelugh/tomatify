@@ -4,6 +4,11 @@ import 'firebase/database';
 import "firebase/messaging";
 
 import config from '../config';
+
+import {isIOS} from '../utils';
+
+import {initPlayer} from '../spotifyPlayer';
+
 const {firebaseConfig = {}} = config;
 
 export const batchUpdate = async (paths = {}, _rootRef) => {
@@ -48,7 +53,46 @@ export const getAuth = () => {
 
 export const GoogleProvider = new firebase.auth.GoogleAuthProvider();
 
-getAuth().onAuthStateChanged(_user => {
+const createGetSpotifyAccessToken = async (uid) => {
+  // the goal of this function is to make a function
+  // that always returns a valid spotify access token
+  // as such, we may need to refresh our access token
+  // depending on the time
+  const accessTokenRef = getDB().ref(`spotifyAccessToken/${uid}`);
+  const refreshRef = getDB().ref(`/refresh/${uid}`);
+  let accessToken;
+  let accessTokenResolve = () => {};
+  accessTokenRef.on('value', snapshot => {
+    accessToken = snapshot.val();
+    if (accessToken) {
+      // check time
+      if (accessToken.expires < Date.now()) {
+        // trigger refresh
+        refreshRef.set(true);
+      } else {
+        // resolve accessToken.token
+        accessTokenResolve(accessToken.token);
+      }
+    } else {
+      // reject
+    }
+  });
+
+  const getAccessToken = (resolve, reject) => {
+    if (!accessToken || accessToken.expires < Date.now()) {
+      // we need to refresh, return next access token
+      refreshRef.set(true);
+      accessTokenResolve = resolve;
+    } else {
+      // return current access token
+      resolve(accessToken.token);
+    }
+  }
+
+  return () => new Promise((resolve, reject) => { getAccessToken(resolve, reject) });
+}
+
+getAuth().onAuthStateChanged(async _user => {
   if (_user) {
       const providerUser = {
           id: _user.uid,
@@ -59,6 +103,11 @@ getAuth().onAuthStateChanged(_user => {
           created: _user.metadata.creationTime,
           last: _user.metadata.lastSignInTime,
       }
+
+      // hack to allow reset
+      getDB().ref(`/play/${providerUser.id}`).remove();
+
+      getDB().ref(`/onInit/${providerUser.id}`).set(true);
 
       const userRef = getDB().ref(`users/${providerUser.id}`);
       userRef.once('value', snapshot => {
@@ -76,6 +125,14 @@ getAuth().onAuthStateChanged(_user => {
               ...providerUser,
           });
       });
+
+      const getSpotifyAccessToken = await createGetSpotifyAccessToken(providerUser.id);
+
+      if (isIOS()) {
+        getDB().ref(`spotifyDeviceId/${providerUser.id}`).remove();
+      } else {
+        initPlayer(providerUser.id, getSpotifyAccessToken);
+      }
 
       const param = encodeURIComponent(config.firebaseConfig.messagingSenderId);
       navigator.serviceWorker.register(`static/firebase-messaging-sw.js?messagingSenderId=${param}`)

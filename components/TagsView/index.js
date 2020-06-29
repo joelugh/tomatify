@@ -13,8 +13,6 @@ import {
 
 import InfiniteScroll from 'react-infinite-scroller';
 
-import Random from '../Random';
-
 import { Emoji } from 'emoji-mart';
 import Loading from '../Loading';
 import Link from 'next/link';
@@ -32,7 +30,6 @@ function TagsView({
 
     const [loaded, setLoaded] = React.useState(true);
     const [numLoaded, setNumLoaded] = React.useState(INIT_NUM_LOAD);
-    const [toggle, setToggle] = React.useState(true);
 
     const root = {
         width: '100%',
@@ -48,20 +45,7 @@ function TagsView({
         flexDirection: 'column',
     }
 
-    const headingComponent = <>
-        <div style={{display:'flex'}}>
-            <div onClick={() => setToggle(true)} style={{marginLeft: 10, marginRight: 10, color: toggle ? 'black' : 'lightgrey', userSelect: 'none'}}>
-                <Typography component="div" variant="h4" style={{marginTop: 20, marginBottom: 20}}>
-                    Pick
-                </Typography>
-            </div>
-            <div onClick={() => setToggle(false)} style={{marginLeft: 10, marginRight: 10, color: !toggle ? 'black' : 'lightgrey', userSelect: 'none'}}>
-                <Typography component="div" variant="h4" style={{marginTop: 20, marginBottom: 20}}>
-                    Browse
-                </Typography>
-            </div>
-        </div>
-    </>
+    const headingComponent = <Typography component="div" variant="h4" style={{marginTop: 20, marginBottom: 20}}>Tags</Typography>
 
     if (!loaded) {
     return <>
@@ -82,7 +66,7 @@ function TagsView({
 
     return <>
         {headingComponent}
-        {toggle && <div style={{maxWidth: 460, minWidth: 320, display:'flex',flexWrap:'wrap', justifyContent:'center', padding: '10px 20px 50px 20px'}}>
+        <div style={{maxWidth: 460, minWidth: 320, display:'flex',flexWrap:'wrap', justifyContent:'center', padding: '10px 20px 50px 20px'}}>
             {Object.keys(tags).map(tag => <div key={tag} style={{margin:5}}>
                 <Link href="/tags/[id]" as={`/tags/${tag}`}>
                     <Chip
@@ -92,30 +76,7 @@ function TagsView({
                     />
                 </Link>
             </div>)}
-        </div>}
-        {!toggle && <InfiniteScroll
-            pageStart={0}
-            loadMore={() => {
-                setNumLoaded(numLoaded => numLoaded + INC_NUM_LOAD);
-            }}
-            hasMore={numLoaded < Object.keys(tags).length}
-            loader={<div className="loader" style={{display:'flex', justifyContent: 'center', width: '100%', padding: '20px 20px 30px 20px'}} key={0}>Loading ...</div>}
-            style={{width:'100%', display:'flex', flexDirection: 'column', alignItems:'center'}}
-            >
-            <List style={root}>
-                {tagsList.map(tag => {
-                    return <ListItem key={tag} style={listItem}>
-                        <Link href="/tags/[id]" as={`/tags/${tag}`}>
-                            <Button style={{display: 'flex', alignItems: 'flex-end'}}>
-                                <Emoji native emoji={tag} size={16} />
-                                <Typography variant="caption" style={{paddingLeft:5}}>({Object.keys(tags[tag]).length})</Typography>
-                            </Button>
-                        </Link>
-                        <Random pomIds={Object.keys(tags[tag])}/>
-                    </ListItem>
-                })}
-            </List>
-        </InfiniteScroll>}
+        </div>
     </>;
 
 }

@@ -17,7 +17,6 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 import { selectPomData } from '../../utils';
 
 import Tags from '../Tags';
-import PomDrawer from '../PomDrawer';
 
 import { playPom, toggleSavedPom } from '../../redux/firebase';
 import Link from 'next/link';
@@ -190,6 +189,7 @@ RandomCard.propTypes = {
 const ConnectedRandomCard =  compose(
     firebaseConnect(props => ([
         `pom/${props.id}`,
+        `tagsById/${id}`,
     ])),
     connect(
         (state, _props) => ({

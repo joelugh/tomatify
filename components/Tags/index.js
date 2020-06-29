@@ -19,16 +19,18 @@ export const special = {
 }
 
 function Tags(props) {
+    /*
+    To improve performance, connect to Firebase in the parent component with,
+
+    useFirebaseConnect([`tagsById/${id}`])
+
+    */
 
     const {
         id,
         addButton = false,
         deleteButton = false,
     } = props;
-
-    useFirebaseConnect([
-        `tagsById/${id}`,
-    ])
 
     const tags = useSelector(state => id && state.firebase.data.tagsById && state.firebase.data.tagsById[id])
 
@@ -56,20 +58,26 @@ function Tags(props) {
                 open={open}
             >
                 <div onClick={e => e.stopPropagation()}>
-                    <Picker setOpen={setOpen} id={id} />
+                    <Picker onSelect={tag => {
+                        setOpen(false)
+                        const db = getDB();
+                        db.ref(`tags/${tag.id}/${id}`).set(true);
+                        db.ref(`tagsById/${id}/${tag.id}`).set(true);
+                    }} />
                 </div>
             </Dialog>}
             <>
-                {specialTags.map(tag => tags[tag] && <Link key={tag} href="/tags/[id]" as={`/tags/${tag}`}>
+                {/* {specialTags.map(tag => tags[tag] && <Link key={tag} href="/tags/[id]" as={`/tags/${tag}`}>
                     <Chip
                         size="small"
                         variant="outlined"
                         label={<span style={{fontSize:12}}><Emoji native emoji={tag} size={11} /></span>}
                         onClick={e => onClickTag(e,tag)}
                     />
-                </Link>)}
+                </Link>)} */}
                 {otherTags.map(tag => tags[tag] && <Link key={tag} href="/tags/[id]" as={`/tags/${tag}`}>
                     <Chip
+                        style={{marginRight:2,marginTop:2}}
                         key={tag}
                         size="small"
                         variant="outlined"

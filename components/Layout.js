@@ -1,6 +1,6 @@
 import React from 'react';
 import {useSelector, useDispatch} from 'react-redux';
-import {isLoaded} from 'react-redux-firebase';
+import {isLoaded, isEmpty} from 'react-redux-firebase';
 
 import {getAuth} from '../db';
 import {setInitialised} from '../redux/client';
@@ -8,15 +8,19 @@ import {setInitialised} from '../redux/client';
 import BottomNav from "./BottomNav";
 import Header from "./Header";
 import Loading from './Loading';
+import CurrentlyPlaying from './CurrentlyPlaying';
 
 function Layout({
     hideHeader = false,
+    hidePlaying = false,
     hideNav = false,
     children,
 }) {
 
     const initialised = useSelector(state => state.client.initialised);
     const auth = useSelector(state => state.firebase.auth);
+    const user = useSelector(state => state.firebase.profile);
+    const isUser = user != null && isLoaded(auth) && !isEmpty(auth);
 
     const dispatch = useDispatch();
 
@@ -32,13 +36,14 @@ function Layout({
 
     return <>
         {!hideHeader && <Header />}
-        {!hideNav && <BottomNav />}
+        {isUser && !hidePlaying && <CurrentlyPlaying />}
+        {isUser && !hideNav && <BottomNav />}
         <div style={{
             display:'flex',
             flexDirection: 'column',
             alignItems:'center',
-            paddingTop: 40,
-            paddingBottom: 60,
+            paddingTop: hideHeader ? 0 : 40,
+            paddingBottom: 60 + (hidePlaying?0:80),
         }}>
             {!loaded && <Loading />}
             {loaded && children}

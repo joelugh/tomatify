@@ -1,20 +1,54 @@
 import axios from 'axios';
 
+import {
+  isIOS,
+} from "../utils";
+
 import { getDB, TIMESTAMP } from '../db';
 
 import config from '../config';
+import { setPlayPom } from './spotify';
 
-export const playPom = (id) => async (dispatch, getState) => {
+export const pause = () => async (dispatch, getState) => {
+  try {
+    const db = getDB();
+    const state = getState();
+    const {uid} = state.firebase.auth;
+    db.ref(`play/${uid}`).set({pause: 1});
+  } catch(err){
+    console.log(err);
+  }
+}
+
+export const play = () => async (dispatch, getState) => {
+  try {
+    const db = getDB();
+    const state = getState();
+    const {uid} = state.firebase.auth;
+    db.ref(`play/${uid}`).set({pause: 0});
+  } catch(err){
+    console.log(err);
+  }
+}
+
+export const playPom = (id, idx=0) => async (dispatch, getState) => {
   const db = getDB();
   const state = getState();
   const pomClickRef = db.ref(`clicks/${id}`);
   pomClickRef.transaction(currentClicks => (currentClicks || 0) + 1);
+  const {uid} = state.firebase.auth;
   try {
-    const {uri} = state.firebase.data.pom[id];
-    document.location.href = uri;
+    dispatch(setPlayPom(id));
+    db.ref(`play/${uid}`).set({
+      id,
+      idx,
+    });
+    if (isIOS()) {
+      const spotifyPomPlaylist = state.firebase.data.spotifyPomPlaylist[uid];
+      document.location.href = `spotify:playlist:${spotifyPomPlaylist}`;
+    }
   } catch(err){}
 }
-
 
 export const toggleSavedPom = (id) => async (dispatch, getState) => {
   const db = getDB();
@@ -26,29 +60,39 @@ export const toggleSavedPom = (id) => async (dispatch, getState) => {
   } catch(err) { console.log(err) }
 }
 
-
-export const addPom = (playlist) => async (dispatch, getState) => {
+export const addPom = (title, trackItems, soundEffectItem, tags=[], description="") => async (dispatch, getState) => {
   const db = getDB();
   const state = getState();
-  const {
-      uri,
-      name: title,
-  } = playlist;
-    const user = state.firebase.profile;
-    const userName = user.name;
-    const userId = user.id;
-    const duration = playlist.tracks.items.map(t => t.track.duration_ms).reduce((a,b) => a + b, 0)/1000;
-    const pomRef = db.ref(`pom/${uri}`);
-    pomRef.set({
-        uri,
-        title,
-        duration,
-        userId,
-        userName,
-        createTime: TIMESTAMP,
-        spotify: playlist,
-    });
-    db.ref(`users/${userId}/poms/${uri}`).set(1);
+  const user = state.firebase.profile;
+  const userName = user.name;
+  const userId = user.id;
+  const tracks = trackItems.map(i => i.track);
+  const soundEffect = soundEffectItem.track;
+  const durationMs = tracks.map(track => track.duration_ms).reduce((a,b) => a + b, 0);
+  const pomRef = db.ref(`pom`);
+  const newPomRef = pomRef.push();
+  const pomId = newPomRef.key;
+  const pomUpdate = {
+    title,
+    durationMs,
+    tracks,
+    userId,
+    userName,
+    description,
+    createTime: TIMESTAMP,
+    soundEffect,
+  };
+  const tagUpdates = {};
+  tags.forEach(tag => {
+    tagUpdates[`tags/${tag}/${pomId}`] = true;
+    tagUpdates[`tagsById/${pomId}/${tag}`] = true;
+  })
+  await db.ref("/").update({
+    [`pom/${pomId}`]: pomUpdate,
+    [`users/${userId}/poms/${pomId}`] : 1,
+    ...tagUpdates,
+  });
+  return pomId;
 }
 
 

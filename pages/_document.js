@@ -2,6 +2,7 @@ import React, { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import Document, { Head, Main, NextScript } from 'next/document'
 import { ServerStyleSheets } from '@material-ui/styles';
+import {isIOS} from '../utils';
 import theme from '../utils/theme';
 
 import config from '../config';
@@ -27,6 +28,7 @@ class MyDocument extends Document {
                         gtag('js', new Date());
                         gtag('config', '${config.gaProperty}');
                     `}}></script>
+                    {!isIOS() && <script src="https://sdk.scdn.co/spotify-player.js"></script>}
                 </Head>
                 <body>
                     <Main />

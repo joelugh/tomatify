@@ -7,6 +7,7 @@
     import TableCell from '@material-ui/core/TableCell';
     import TableHead from '@material-ui/core/TableHead';
     import TableRow from '@material-ui/core/TableRow';
+    import { Button, Link } from '@material-ui/core';
 
     const styles = theme => ({
         root: {
@@ -19,13 +20,13 @@
             tableLayout: 'fixed',
         },
         row: {
-            height: 0,
+            height: 30,
             maxWidth: 500,
         },
     });
 
     function TrackTable(props) {
-        const { classes, tracks } = props;
+        const { classes, tracks, activeTrack, onClick } = props;
         const widths = ['8%', '67%', '25%'];
         return (
             <Table className={classes.table}>
@@ -37,13 +38,14 @@
                 </TableRow>
                 </TableHead>
                 <TableBody>
-                {tracks.map((track,idx) => (
-                    <TableRow key={idx} className={classes.row}>
-                    <TableCell style={{width: widths[0]}} component="th" scope="row" padding="none"><Typography variant="caption" >{idx + 1}</Typography></TableCell>
-                    <TableCell style={{width: widths[1]}} align="left" padding="none"><Typography variant="caption" component="div" noWrap>{track.title}</Typography></TableCell>
-                    <TableCell style={{width: widths[2]}} align="right" padding="none" ><Typography variant="caption" >{track.remaining}</Typography></TableCell>
+                {tracks.map((track,idx) => {
+                    const color = track.uri == activeTrack ? 'secondary' : 'inherit';
+                    return <TableRow key={idx} className={classes.row} onClick={() => onClick(idx)}>
+                        <TableCell style={{width: widths[0]}} component="th" scope="row" padding="none"><Typography variant="caption" color={color}>{idx + 1}</Typography></TableCell>
+                        <TableCell style={{width: widths[1], userSelect: 'none'}} align="left" padding="none"><Typography noWrap><Link variant="caption" color={color}>{track.title}</Link></Typography></TableCell>
+                        <TableCell style={{width: widths[2]}} align="right" padding="none" ><Typography variant="caption" color={color}>{track.remaining}</Typography></TableCell>
                     </TableRow>
-                ))}
+                })}
                 </TableBody>
             </Table>
         );

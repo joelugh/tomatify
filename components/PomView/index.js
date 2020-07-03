@@ -15,11 +15,12 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 
 import { playPom, toggleSavedPom } from '../../redux/firebase';
 
-import { selectPomData } from '../../utils';
+import { selectPomData, useCurrentlyPlaying } from '../../utils';
 import TrackList from '../TrackList';
 import Tags from '../Tags';
 import Link from 'next/link';
 import ShareButton from '../ShareButton';
+import Cover from '../Cover';
 
 // This resolves to nothing and doesn't affect browser history
 const dudUrl = 'javascript:;';
@@ -48,11 +49,6 @@ const useStyles = makeStyles({
     },
     description: {
         paddingBottom: 15,
-    },
-    cover: {
-        objectFit: 'cover',
-        width: 100,
-        height: 100,
     },
     playButton: {
         backgroundColor: 'rgba(0,0,0,.05)',
@@ -90,6 +86,7 @@ function PomView({
 
     useFirebaseConnect([
         `pom/${id}`,
+        `tagsById/${id}`,
     ]);
 
     const classes = useStyles();
@@ -97,9 +94,12 @@ function PomView({
 
     const pom = useSelector(state => id && state.firebase.data.pom && state.firebase.data.pom[id]);
     const user = useSelector(state => state.firebase.profile);
+    const currentlyPlaying = useCurrentlyPlaying();
+    console.log(currentlyPlaying);
+    const activeTrack = currentlyPlaying && currentlyPlaying.pom == id && currentlyPlaying.track;
 
     const toggleSaved = () => dispatch(toggleSavedPom(id));
-    const play = () => dispatch(playPom(id));
+    const play = (idx) => dispatch(playPom(id, idx));
 
     const {
         title = '',
@@ -138,10 +138,7 @@ function PomView({
                     paddingBottom: 20,
                 }}
             >
-                <img src={imageSrc} className={classes.cover} />
-                <IconButton aria-label="play" className={classes.playButton} onClick={play} >
-                    <PlayArrowIcon />
-                </IconButton>
+                <Cover id={id} size={100} />
                 <Typography variant="h5" style={{paddingTop: 10, textAlign: 'center'}}>
                     {title}
                 </Typography>
@@ -167,8 +164,8 @@ function PomView({
                     {description}
                 </Typography>
             </div>}
-            <TrackList tracks={tracks} />
-            <Button style={{marginTop: 15}} onClick={play}>Play Now</Button>
+            <TrackList tracks={tracks} activeTrack={activeTrack} onClick={idx => play(idx)} />
+            <Button style={{marginTop: 15}} onClick={() => play(0)}>Play Now</Button>
         </div>
     </div>;
 }

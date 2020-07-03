@@ -12,6 +12,8 @@ import TagFacesIcon from '@material-ui/icons/TagFaces';
 
 import { setFilter } from '../redux/client';
 
+export const bottomNavHeight = 60;
+
 const useStyles = makeStyles({
     container: {
         boxShadow: '0px 1px 2px grey',
@@ -25,6 +27,7 @@ const useStyles = makeStyles({
     },
     root: {
         width: 320,
+        height: bottomNavHeight,
     },
 });
 

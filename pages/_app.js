@@ -2,8 +2,8 @@ import React from 'react';
 import App from 'next/app';
 import Head from 'next/head';
 import { compose } from 'redux'
-import { Provider, connect } from 'react-redux';
-import { firebaseConnect, ReactReduxFirebaseProvider } from 'react-redux-firebase';
+import { Provider, connect, useSelector } from 'react-redux';
+import { firebaseConnect, ReactReduxFirebaseProvider, useFirebaseConnect } from 'react-redux-firebase';
 
 import withReduxStore from '../utils/withReduxStore';
 
@@ -12,7 +12,6 @@ import { ThemeProvider } from '@material-ui/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 import { getFirebase as getFirebaseApp } from '../db';
-
 
 class _App extends App {
 
@@ -50,12 +49,18 @@ class _App extends App {
             reduxStore,
         } = this.props;
 
-        // const FirebaseComponent = <Component {...pageProps} />
-        const FirebaseComponent = compose(
-            connect((state, props) => ({})),
-            firebaseConnect((props) => []),
-          // exclude firebase from pageProps
-          )(({firebase, ...props}) => <Component {...props} />)
+        function FirebaseComponent(props) {
+            const user = useSelector(state => state.firebase.profile);
+            const uid = user && user.id;
+            const paths = !uid ? [] : [
+                `currentlyPlaying/${uid}`,
+                `spotifyPomPlaylist/${uid}`,
+                `spotifyAccessToken/${uid}`,
+                `spotifyDeviceId/${uid}`,
+            ]
+            useFirebaseConnect(paths);
+            return <Component {...props}/>
+        }
 
         const rrfConfig = {
             userProfile: 'users', // firebase root where user profiles are stored

@@ -5,7 +5,6 @@ import { firebaseConnect, isLoaded, isEmpty } from 'react-redux-firebase';
 
 import Typography from '@material-ui/core/Typography';
 
-import Random from '../Random';
 import PomList from '../PomList';
 
 import InfiniteScroll from 'react-infinite-scroller';
@@ -54,7 +53,6 @@ function UserView(props) {
 
     let pomIds = (recent && recent["all"]) || [];
     if (user) {
-        // TODO: Need to pass same refs to prevent rerenders of random component
         if (pomIds) pomIds = pomIds.filter(id => user[id]);
     }
 
@@ -86,7 +84,6 @@ function UserView(props) {
                 <ShareButton name={name} />
             </div>
             {headingComponent}
-            {recent && <Random pomIds={pomIds} />}
             {recent &&
             <InfiniteScroll
                 pageStart={0}

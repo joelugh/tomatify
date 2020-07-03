@@ -8,7 +8,7 @@ function TagNav(props) {
     const MARGIN = 0;
     const PADDING = 4;
 
-    return <div style={{display:'flex', flexWrap:'wrap', justifyContent:'center'}}>
+    return <div style={{display:'flex', flexWrap:'wrap', justifyContent:'center', margin: 10}}>
         <div>
             <Link href="/tags/[id]" as={`/tags/hatching_chick`}>
                 <Button size="small" style={{marginLeft:MARGIN,marginRight:MARGIN}}>

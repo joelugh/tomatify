@@ -10,10 +10,12 @@ import batchedSubscribeEnhancer from './batching/enhancer'
 import { firebaseReducer, getFirebase} from 'react-redux-firebase'
 
 import clientReducer from './client';
+import spotifyReducer from './spotify';
 
 const rootReducer = combineReducers({
 	firebase: firebaseReducer,
 	client: clientReducer,
+	spotify: spotifyReducer,
 })
 
 export const initialState = {
@@ -25,15 +27,23 @@ const composeEnhancers = composeWithDevTools({
   trace: true, traceLimit: 25,
 });
 
+export let store;
+
 export function configureStore(state = initialState) {
 
 	const middlewares = [
 		applyMiddleware(thunk.withExtraArgument(getFirebase))
 	];
 
+	// batching for firebase-redux actions
+	middlewares.push(...[
+		batchedSubscribeEnhancer,
+		applyMiddleware(batchedSubscribeMiddleware),
+	])
+
 	const enhancer = composeEnhancers(...middlewares)
 
-	const store = createStore(rootReducer, state, enhancer);
+	store = createStore(rootReducer, state, enhancer);
 
 	return store;
 

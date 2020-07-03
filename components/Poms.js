@@ -3,7 +3,6 @@ import React from 'react';
 import Typography from '@material-ui/core/Typography';
 
 import TagNav from './TagNav';
-import Random from './Random';
 import PomList from './PomList';
 
 import InfiniteScroll from 'react-infinite-scroller';
@@ -57,7 +56,6 @@ function Poms(props) {
         <>
             {headingComponent}
             {recent && <TagNav />}
-            {recent && <Random pomIds={pomIds} />}
             {recent &&
             <InfiniteScroll
                 pageStart={0}

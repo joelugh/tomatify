@@ -109,7 +109,6 @@ function Pom({
         userName = '',
         description = '',
         duration = 0,
-        imageSrc = '',
         lastModified = '',
         tracks = [],
     } = pom ? selectPomData(pom) : {};

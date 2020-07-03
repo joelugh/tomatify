@@ -2,6 +2,7 @@ import React from 'react';
 
 export default function Mosaic({srcs, size=60}) {
     if (!srcs || !srcs.length) return null;
+    srcs = srcs.filter((v, i, a) => a.indexOf(v) === i); // remove dupes
     if (srcs.length == 1) {
         // return first;
         return <img src={srcs[0]} height={size} width={size}/>;

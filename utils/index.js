@@ -21,7 +21,7 @@ export const selectPomData = pom => {
         durationMs: _durationMs = 0,
         createTime = 0,
         tracks: _tracks = [],
-        image,
+        images,
         soundEffect,
     } = pom;
     let remaining_ms = _tracks.reduce((sum, track) => sum + track.duration_ms, 0);
@@ -42,14 +42,14 @@ export const selectPomData = pom => {
         return acc;
     }, []);
     const tracks = (soundEffect) ? [...tracks_nofx, selectTrack(soundEffect)] : tracks_nofx;
-    const imageSrc = image && image.url;
+    const imageSrcs = images && images.map(image => image.url);
     const duration = Math.floor(parseInt(_durationMs/1000,10)/60);
     const description = _description ? he.decode(_description) : "";
     const lastModified = createTime;
     return {
         description,
         duration,
-        imageSrc,
+        imageSrcs,
         lastModified,
         title,
         tracks,
@@ -66,7 +66,7 @@ export const usePomDetails = (id) => {
     `pom/${id}/userId`,
     `pom/${id}/description`,
     `pom/${id}/createTime`,
-    `pom/${id}/image`,
+    `pom/${id}/images`,
     `pom/${id}/durationMs`,
   ])
   return useSelector((state) => state.firebase.data.pom && state.firebase.data.pom[id]);

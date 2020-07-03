@@ -107,7 +107,6 @@ function PomView({
         userId = '',
         description = '',
         duration = 0,
-        imageSrc = '',
         lastModified = '',
         tracks = [],
     } = pom ? selectPomData(pom) : {};

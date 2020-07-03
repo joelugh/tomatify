@@ -67,6 +67,7 @@ export const addPom = (title, trackItems, soundEffectItem, tags=[], description=
   const userName = user.name;
   const userId = user.id;
   const tracks = trackItems.map(i => i.track);
+  const images = tracks.map(t => t && t.album && t.album.images && t.album.images[0]).filter(o => !!o);
   const soundEffect = soundEffectItem.track;
   const durationMs = tracks.map(track => track.duration_ms).reduce((a,b) => a + b, 0);
   const pomRef = db.ref(`pom`);
@@ -76,6 +77,7 @@ export const addPom = (title, trackItems, soundEffectItem, tags=[], description=
     title,
     durationMs,
     tracks,
+    images,
     userId,
     userName,
     description,

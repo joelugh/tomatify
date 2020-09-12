@@ -19,7 +19,7 @@
     "expo-server-sdk": "^3.5.0",
     "firebase-admin": "^8.0.0",
     "firebase-functions": "^3.0.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "qs": "^6.9.4",
     "querystring": "^0.2.0",
     "spotify-web-api-node": "^4.0.0"
